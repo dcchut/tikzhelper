@@ -1,0 +1,44 @@
+<html metal:use-macro="load: main.pt">
+
+<div metal:fill-slot="content">
+	<div class="code_wrapper">
+	<textarea rows="${rows}" id="code">${tikz_code}</textarea><br />
+	</div>
+	<form id="tools" method="POST" action="${request.route_url('home')}">
+	<input type="button" value="Copy to clipboard" onclick="javascript:copyToClipboard()" />
+	<input type="button" value="Back" onclick="javascript:submitForm()" />
+	</form>
+	<p>Submitted: a: ${a}, b: ${b}, &theta;: ${theta} &deg;</p>
+	<script>
+	function copyStringToClipboard (str) {
+   // Create new element
+   var el = document.createElement('textarea');
+   // Set value (string to be copied)
+   el.value = str;
+   // Set non-editable to avoid focus and move outside of view
+   el.setAttribute('readonly', '');
+   el.style = {position: 'absolute', left: '-9999px'};
+   document.body.appendChild(el);
+   // Select text inside element
+   el.select();
+   // Copy text to clipboard
+   document.execCommand('copy');
+   // Remove temporary element
+   document.body.removeChild(el);
+}
+
+function copyToClipboard() {
+	var text = document.getElementById("code");
+	copyStringToClipboard(text.value);
+}
+
+function submitForm() {
+	document.getElementById("tools").submit();
+}
+</script>
+</div>
+
+
+
+
+</html>
