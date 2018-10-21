@@ -1,0 +1,144 @@
+<div metal:use-macro="load: layout.pt">
+    <div metal:fill-slot="content" class="content">
+        <div tal:condition="tikz" class="mb-4">
+            <p class="font-weight-bold">Generated code:</p>
+            <div class="bd-highlight">
+                <pre><code class="language-latex">${tikz}</code></pre>
+            </div>
+        </div>
+        <p class="font-weight-bold">Specify a triangle:</p>
+        <div tal:condition="e">
+            <div class="alert alert-danger" tal:condition="form.error">
+            <div class="error-msg-lbl" i18n:translate="">There was a problem with your submission</div>
+            </div>
+        </div>
+        <form method="POST"
+              action="${request.route_url('triangle')}">
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <label for="${form['a'].oid}">Side length (a):</label>
+                        ${structure:form['a'].serialize()}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="${form['b'].oid}">Side length (b):</label>
+                        ${structure:form['b'].serialize()}
+                    </div>
+                </div>
+
+                <div class="form-row" tal:condition="form['a'].error or form['b'].error">
+                    <div class="col-md-4">
+                        <div class="mt-2 mb-2" tal:condition="form['a'].error">
+                            <span class="text-danger">${form['a'].errormsg}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mt-2 mb-2" tal:condition="form['b'].error">
+                            <span class="text-danger">${form['b'].errormsg}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="col-md-8">
+                        <small class="form-text text-muted">Specify side lengths in centimetres. A side length close to 5 is recommended.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <label for="${form['theta'].oid}">Angle (&theta;):</label>
+                        ${structure:form['theta'].serialize()}
+                    </div>
+                </div>
+                <div class="form-row" tal:condition="form['theta'].error">
+                        <div class="col-md-4">
+                            <div class="mt-2 mb-2" tal:condition="form['theta'].error">
+                                <span class="text-danger">${form['theta'].errormsg}</span>
+                            </div>
+                        </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <small class="form-text text-muted">Specify an angle between 0 and 180 degrees.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <label for="${form['label_a'].oid}">Side label (a):</label>
+                        ${structure:form['label_a'].serialize()}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="${form['label_b'].oid}">Side label (b):</label>
+                        ${structure:form['label_b'].serialize()}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="${form['label_c'].oid}">Side label (c):</label>
+                        ${structure:form['label_c'].serialize()}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        <small class="form-text text-muted">Side labels are not required.  Labels should look something like $x$.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <label for="${form['label_angle_A'].oid}">Angle label (A):</label>
+                        ${structure:form['label_angle_A'].serialize()}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="${form['label_angle_B'].oid}">Angle label (B):</label>
+                        ${structure:form['label_angle_B'].serialize()}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="${form['label_angle_C'].oid}">Angle label (C):</label>
+                        ${structure:form['label_angle_C'].serialize()}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        <small class="form-text text-muted">Angle labels are not required.  Labels should look something like $\theta$.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="col">
+                        ${structure:form['show_angle_A'].serialize()}
+                    </div>
+                    <div class="col">
+                        ${structure:form['show_angle_B'].serialize()}
+                    </div>
+                    <div class="col">
+                        ${structure:form['show_angle_C'].serialize()}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        <small class="form-text text-muted">Whether a particular angle should be rendered.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <button id="${form.formid+'submit'}"
+                        name="${form.buttons[0].name}"
+                        type="${form.buttons[0].type}"
+                        class="btn btn-primary ${form.buttons[0].css_class or ''}"
+                        value="${form.buttons[0].value}">
+                ${form.buttons[0].title}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+

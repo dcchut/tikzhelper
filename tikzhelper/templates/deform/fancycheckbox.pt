@@ -1,0 +1,14 @@
+<div class="custom-control custom-checkbox"
+    tal:define="name name|field.name;
+                   true_val true_val|field.widget.true_val;
+                   css_class css_class|field.widget.css_class;
+                   style style|field.widget.style;
+                   oid oid|field.oid;">
+    <input type="checkbox" name="${name}" value="${true_val}" id="${oid}"
+       tal:attributes="checked cstruct == true_val;
+                       class css_class;
+                       style style;"/>
+    <label class="custom-control-label" for="${field.oid}">
+        ${field.widget.label}
+    </label>
+</div>

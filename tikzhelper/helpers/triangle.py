@@ -1,11 +1,5 @@
 from math import sqrt, cos, sin, pi, acos
 
-def to_degrees(theta):
-    return theta * (180/pi)
-
-def to_radians(theta):
-    return theta * (pi/180)
-
 # draws the triangle with sides a, b
 # together with the angle between them
 class Triangle:
@@ -14,7 +8,7 @@ class Triangle:
     def __init__(self,a,b,theta):
         self.a = a
         self.b = b
-        self.theta = to_radians(theta)
+        self.theta = theta * (pi/180)
 
         # compute the length of the remaining side
         self.c = sqrt(self.a**2 + self.b**2 - 2 * self.a * self.b * cos(self.theta))
@@ -52,17 +46,21 @@ class TikzBuilder:
 
         self.tikz += tmp
 
-    def draw_angle(self,start_position, end_position, mode):
+    def draw_angle(self,start_position, end_position, mode, label=None, direction=None):
         tmp = '\\draw (' + str(start_position[0]) + ',' + str(start_position[1]) + ') ' + mode
+        if label is not None and label  != '':
+            tmp += ' node[midway'
+            if direction is not None:
+                tmp += ',' + direction
+            tmp += '] {' + label + '}'
         tmp += ' (' + str(end_position[0]) + ',' + str(end_position[1]) + ');\n'
-
         self.tikz += tmp
 
 class TikzTriangle:
     def __init__(self,constructor):
         self.constructor = constructor
 
-    def draw(self, label_a, label_b, label_c, tolerance = 0.0001, label_angle_A = None, label_angle_B = None, label_angle_C = None, color_start=None, color_end = None, scale=1, align='center'):
+    def draw(self, label_a, label_b, label_c, tolerance = 0.0001,show_angle_A = False, show_angle_B = False, show_angle_C = False, label_angle_A = None, label_angle_B = None, label_angle_C = None, color_start=None, color_end = None, scale=1, align='center'):
         builder = TikzBuilder()
 
         # if we want to align our drawing
@@ -79,7 +77,7 @@ class TikzTriangle:
         # compute coordinates for the vertices of our triangle
         # we always assume that the base of the triangle is sitting on the x-axis
         coordinate_A = (0,0)
-        coordinate_B = (self.constructor.b * cos(self.constructor.theta), self.constructor.b * cos(self.constructor.theta))
+        coordinate_B = (self.constructor.b * cos(self.constructor.theta), self.constructor.b * sin(self.constructor.theta))
         coordinate_C = (self.constructor.a,0)
 
 
@@ -93,13 +91,11 @@ class TikzTriangle:
              {'coordinate' : 'B', 'node' : {'position' : 'right', 'label' : label_c}},
              {'coordinate' : 'C', 'node' : {'position' : 'below', 'label' : label_b}}]
 
-	builder.draw_cycle(v)
-
-	# draw the angles for which we have a label now
         length = min(0.5, 0.15 * min(self.constructor.a, self.constructor.b))
         rectangle_length = min(0.3, 0.15 * min(self.constructor.a, self.constructor.b))
+        label_distance = 0.5
 
-        if label_angle_A is not None:
+        if show_angle_A:
             if (abs(self.constructor.alpha - pi/2) < tolerance):
                 mode = 'rectangle'
                 curr_length = rectangle_length
@@ -108,12 +104,11 @@ class TikzTriangle:
                 curr_length = length
 
             start_position = (coordinate_C[0] - curr_length,coordinate_C[1])
-            end_position = (coordinate_C[0],coordinate_C[1]+curr_length)
+            end_position = (coordinate_C[0]-curr_length*cos(self.constructor.alpha),coordinate_C[1]+curr_length*sin(self.constructor.alpha))
 
-            builder.draw_angle(start_position=start_position,end_position=end_position,mode=mode)
-            builder.tikz += '\\node[label={[label distance=.25cm]170:' + label_angle_A +'}] at (C) {};\n'
-
-        if label_angle_B is not None:
+            builder.draw_angle(start_position=start_position,end_position=end_position,mode=mode,label=label_angle_A,direction='left')
+            
+        if show_angle_B:
             if (abs(self.constructor.beta - pi/2) < tolerance):
                 mode = 'rectangle'
                 curr_length = rectangle_length
@@ -121,13 +116,13 @@ class TikzTriangle:
                 mode = 'to[bend right]'
                 curr_length = length
 
-            start_position = (coordinate_B[0]-(curr_length * cos(self.constructor.beta)),coordinate_B[1]-(curr_length * sin(self.constructor.beta)))
-            end_position = (coordinate_B[0],coordinate_B[1]-curr_length)
+            start_position = (coordinate_B[0]-(curr_length * cos(self.constructor.theta)),coordinate_B[1]-(curr_length *
+sin(self.constructor.theta)))
+            end_position = (coordinate_B[0]-curr_length*cos(self.constructor.theta+self.constructor.beta),coordinate_B[1]-curr_length*sin(self.constructor.theta+self.constructor.beta))
 
-            builder.draw_angle(start_position=start_position,end_position=end_position,mode=mode)
-            builder.tikz += '\\node[label={[label distance=.5cm]260:' + label_angle_B +'}] at (B) {};\n'
+            builder.draw_angle(start_position=start_position,end_position=end_position,mode=mode,label=label_angle_B,direction='below')
 
-        if label_angle_C is not None:
+        if show_angle_C:
             if (abs(self.constructor.theta - pi/2) < tolerance):
                 mode = 'rectangle'
                 curr_length = rectangle_length
@@ -138,8 +133,9 @@ class TikzTriangle:
             start_position = (coordinate_A[0]+curr_length,coordinate_A[1])
             end_position = (coordinate_A[0]+(curr_length * cos(self.constructor.theta)), coordinate_A[1]+(curr_length * sin(self.constructor.theta)))
 
-            builder.draw_angle(start_position=start_position,end_position=end_position,mode=mode)
-            builder.tikz += '\\node[label={[label distance=.5cm]10:' + label_angle_C +'}] at (A) {};\n'
+            builder.draw_angle(start_position=start_position,end_position=end_position,mode=mode,label=label_angle_C,direction='right')
+        
+        builder.draw_cycle(v)
 
         # end all of the open tags
         builder.simple_tag('end','tikzpicture')
@@ -152,9 +148,9 @@ class TikzTriangle:
 
         return builder.tikz
 
-def draw_triangle(a,b,theta,label_a='a',label_b='b',label_c='c',label_angle_A=None,label_angle_B=None,label_angle_C=None,
-color_start='black',color_end='red',scale=1.25):
+def draw_triangle(a,b,theta,label_a='a',label_b='b',label_c='c',show_angle_A=False,show_angle_B=False,show_angle_C=False,label_angle_A=None,label_angle_B=None,label_angle_C=None,
+color_start='black',color_end='red',scale=1):
     constructor = Triangle(a,b,theta)
     triangle = TikzTriangle(constructor)
-    return triangle.draw(label_a,label_b,label_c,label_angle_A=label_angle_A,label_angle_B=label_angle_B,label_angle_C=label_angle_C,
-    color_start=color_start,color_end=color_end,scale=1.25)
+    return triangle.draw(label_a,label_b,label_c,show_angle_A=show_angle_A,show_angle_B=show_angle_B,show_angle_C=show_angle_C,label_angle_A=label_angle_A,label_angle_B=label_angle_B,label_angle_C=label_angle_C,
+    color_start=color_start,color_end=color_end,scale=scale)
