@@ -13,8 +13,8 @@
     <!-- Custom styles for this scaffold -->
     <link href="${request.static_url('tikzhelper:static/theme.css')}" rel="stylesheet">
 
-    <!-- Prism styles -->
-    <link href="${request.static_url('tikzhelper:static/prism.css')}" rel="stylesheet">
+    <!-- Custom styles -->
+    <link tal:repeat="href req_css" href="${request.static_url(href)}" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -52,7 +52,7 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="${request.static_url('deform:static/scripts/deform.js')}" type="text/javascript"></script>
-    <script src="${request.static_url('tikzhelper:static/prism.js')}" type="text/javascript"></script>
+    <!-- Required javascript -->
+    <script tal:repeat="src req_js" src="${request.static_url(src)}"  type="text/javascript"></script>
    </body>
 </html>

@@ -53,13 +53,26 @@ class TriangleView(TabbedView):
         # set up the triangle schema
         self.schema = TriangleSchema()
 
+    def get_view(self):
+        view = super().get_view()
+
+        # load the files necessary for prism
+        view['req_js'].append('tikzhelper:static/prism.js')
+        view['req_css'].append('tikzhelper:static/prism.css')
+
+        # load the javascript for deform
+        view['req_js'].append('deform:static/scripts/deform.js')
+
+        return view
+
     @view_config(route_name='home', renderer='../templates/triangle.pt')
     @view_config(route_name='triangle', renderer='../templates/triangle.pt')
     def triangle(self):
         form = deform.Form(self.schema, buttons=('submit',))
 
-        view = {}
-        view['nav'] = self.navigation()
+        view = self.get_view()
+
+        # define local variables
         view['tikz'] = ''
         view['e'] = ''
 

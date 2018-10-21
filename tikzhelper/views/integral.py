@@ -8,6 +8,13 @@ class IntegralView(TabbedView):
         # set this as the piecewise tab
         super().__init__('integral')
 
+    def get_view(self):
+        view = super().get_view()
+
+        return view
+
     @view_config(route_name='integral', renderer='../templates/integral.pt')
     def piecewise(self):
-        return self.render_view()
+        view = self.get_view()
+
+        return view

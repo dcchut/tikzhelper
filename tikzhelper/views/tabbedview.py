@@ -9,13 +9,14 @@ class TabbedView(object):
     def __init__(self, current):
         self.current = current
 
+    def get_view(self):
+        view = {}
+        view['nav'] = self.navigation()
+        view['req_css'] = []
+        view['req_js'] = []
+
+        return view
+
     def navigation(self):
         nav = TabbedNavigation(self.current, tabs)
-
         return nav
-
-    def render_view(self):
-        # prepare the tabbed navigation object
-        nav = TabbedNavigation(self.current, tabs)
-
-        return {'nav' : nav}

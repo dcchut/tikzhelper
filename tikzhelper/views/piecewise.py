@@ -8,6 +8,13 @@ class PiecewiseView(TabbedView):
         # set this as the piecewise tab
         super().__init__('piecewise')
 
+    def get_view(self):
+        view = super().get_view()
+
+        return view
+
     @view_config(route_name='piecewise', renderer='../templates/piecewise.pt')
     def piecewise(self):
-        return self.render_view()
+        view = self.get_view()
+
+        return view

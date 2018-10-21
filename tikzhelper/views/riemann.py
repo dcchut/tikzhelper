@@ -8,6 +8,13 @@ class RiemannView(TabbedView):
         # set this as the piecewise tab
         super().__init__('riemann')
 
+    def get_view(self):
+        view = super().get_view()
+
+        return view
+
     @view_config(route_name='riemann', renderer='../templates/riemann.pt')
     def piecewise(self):
-        return self.render_view()
+        view = self.get_view()
+
+        return view
