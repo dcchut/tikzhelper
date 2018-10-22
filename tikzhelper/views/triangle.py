@@ -39,7 +39,7 @@ class TriangleSchema(colander.MappingSchema):
                                        widget=FancyCheckboxInput(label='Render Angle (B)'),
                                        default=True)
     show_angle_C = colander.SchemaNode(colander.Bool(),
-                                       widget=FancyCheckboxInput(label='Render Angle (B)'),
+                                       widget=FancyCheckboxInput(label='Render Angle (C)'),
                                        default=True)
 
 
