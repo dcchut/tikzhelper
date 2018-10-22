@@ -6,3 +6,7 @@
 .heading {
   margin-bottom: 1em;
 }
+
+.tikzcode {
+    max-height: 20em;
+}

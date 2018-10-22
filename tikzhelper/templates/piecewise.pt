@@ -1,5 +1,155 @@
 <div metal:use-macro="load: layout.pt">
     <div metal:fill-slot="content" class="content">
-        <p>TBC</p>
+        <div tal:condition="tikz and tikz2" class="mb-4">
+            <p class="font-weight-bold">Generated code:</p>
+            <div class="bd-highlight">
+                <pre class="tikzcode"><code class="language-latex">${tikz}</code></pre>
+            </div>
+            <div class="bd-highlight">
+                <pre class="tikzcode"><code class="language-latex">${tikz2}</code></pre>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <p class="font-weight-bold">Define your piecewise function:</p>
+                <div tal:condition="e">
+                    <div class="alert alert-danger" tal:condition="form.error">
+                    <div class="error-msg-lbl" i18n:translate="">There was a problem with your submission</div>
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="col-md-4">
+                        <label for="interval_type">Interval type</label>
+                        <select class="form-control" id="interval_type">
+                            <option>(a,b)</option>
+                            <option>[a,b]</option>
+                            <option>(a,b]</option>
+                            <option>[a,b)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="interval_left">Left endpoint:</label>
+                        <input id="interval_left" type="text" class="form-control" placeholder="a">
+                        <small class="form-text text-muted">If no left endpoint is specified, -&#x221e; is assumed.</small>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="interval_right">Right endpoint:</label>
+                        <input id="interval_right" type="text" class="form-control" placeholder="b">
+                        <small class="form-text text-muted">If no right endpoint is specified, &#x221e; is assumed.</small>
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="col-md-6">
+                        <label for="fn">Formula</label>
+                        <input id="fn" name="fn" type="text" class="form-control" placeholder="Enter formula here">
+                        <small class="form-text text-muted">Formula must be written in terms of \x, e.g. (\x)+sqrt(25-(\x)^2)</small>
+                     </div>
+                    <div class="col-md-6">
+                        <label for="fn_label">Label</label>
+                        <input id="fn_label" name="fn_label" type="text" class="form-control" placeholder="Enter label here">
+                        <small class="form-text text-muted">Use standard latex notation, e.g. x + \sqrt{25-x^2}</small>
+                     </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="col-md-12">
+                        <button class="btn btn-outline-primary" id="fn_add" type="button">Add</button>
+                        <button class="btn btn-outline-primary" id="fn_clear" type="button">Clear</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <p class="font-weight-bold">Current function:</p>
+                <div class="form-row mb-3">
+                    <ul id="fn_list" class="list-group w-100">
+                        <li class="list-group-item d-flex disabled">
+                            <div class="col-md-2 p-0">
+                            Domain
+                            </div>
+                            <div class="col-md-5 pl-2">
+                            Formula
+                            </div>
+                            <div class="col-md-5 pl-2">
+                            Label
+                            </div>
+                        </li>
+                        <li id="fn_listentry_empty" class="list-group-item d-flex">
+                            <div class="col-md-12">
+                            No formula entered.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="form-row mb-3" tal:condition="form['domains'].error or form['functions'].error or form['labels'].error">
+                    <div class="alert alert-warning">
+                        <div class="error-msg-lbl">Your function must be defined.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="font-weight-bold">Graphing settings:</p>
+        <form id="fn_form"
+                  method="GET"
+                  action="${request.route_url('piecewise')}">
+                <input type="hidden" id="fn_form_domains" name="domains" value="" />
+                <input type="hidden" id="fn_form_functions" name="functions" value="" />
+                <input type="hidden" id="fn_form_labels" name="labels" value="" />
+            <div class="form-row mb-3">
+                <div class="col-md-4">
+                            <label for="min_x">Min x:</label>
+                            ${structure:form['min_x'].serialize()}
+                            <small class="form-text text-muted">The minimum x-value to display on our graph.</small>
+                </div>
+                <div class="col-md-4">
+                            <label for="max">Max x:</label>
+                            ${structure:form['max_x'].serialize()}
+                            <small class="form-text text-muted">The maximum x-value to display on our graph.</small>
+                </div>
+            </div>
+
+            <div class="form-row mb-3" tal:condition="form['min_x'].error or form['max_x'].error">
+                <div class="col-md-4">
+                    <div class="alert alert-warning" tal:condition="form['min_x'].error">
+                        <div class="error-msg-lbl">${form['min_x'].errormsg}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="alert alert-warning" tal:condition="form['max_x'].error">
+                        <span class="error-msg-lbl">${form['max_x'].errormsg}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row mb-3">
+                <div class="col-md-4">
+                            <label for="min_y">Min y:</label>
+                            ${structure:form['min_y'].serialize()}
+                            <small class="form-text text-muted">The minimum y-value to display on our graph.</small>
+                </div>
+                <div class="col-md-4">
+                            <label for="max_y">Max y:</label>
+                            ${structure:form['max_y'].serialize()}
+                            <small class="form-text text-muted">The maximum y-value to display on our graph.</small>
+                </div>
+            </div>
+
+            <div class="form-row mb-3" tal:condition="form['min_y'].error or form['max_y'].error">
+                <div class="col-md-4">
+                    <div class="alert alert-warning" tal:condition="form['min_y'].error">
+                        <div class="error-msg-lbl">${form['min_y'].errormsg}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="alert alert-warning" tal:condition="form['max_y'].error">
+                        <span class="error-msg-lbl">${form['max_y'].errormsg}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col-md-3">
+                    <input type="submit" name="submit" value="Generate" class="btn btn-primary">
+                </div>
+            </div>
+        </form>
     </div>
 </div>

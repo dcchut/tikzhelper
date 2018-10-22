@@ -1,7 +1,6 @@
 from math import sqrt, cos, sin, pi, acos
+from tikzhelper.helpers.tikzbuilder import TikzBuilder
 
-# draws the triangle with sides a, b
-# together with the angle between them
 class Triangle:
     # construct a triangle with SAS (A,theta,B)
     # here we expect that theta is in degrees
@@ -16,45 +15,6 @@ class Triangle:
         # what about the remaining two angles?
         self.beta = acos((self.b**2 + self.c**2 - self.a**2) / (float(2) * self.b * self.c ))
         self.alpha = pi - self.theta - self.beta
-
-class TikzBuilder:
-    def __init__(self):
-        self.tikz = ''
-
-    def simple_tag(self,op,v,options=None):
-        tmp = '\\' + op + '{' + v + '}'
-        if options is not None:
-            tmp += '['
-            for k in options:
-                tmp += k + '=' + str(options[k])
-            tmp += ']'
-        self.tikz += tmp + '\n'
-
-    def coordinate(self, label, coordinates):
-        self.tikz += '\\coordinate (' + label + ') at (' + str(coordinates[0]) + 'cm,' + str(coordinates[1]) + 'cm);\n'
-
-    def draw_cycle(self,v):
-        tmp = '\\draw '
-
-        for dt in v:
-            tmp += '(' + dt['coordinate'] + ') -- '
-            if 'node' in dt:
-                tmp += 'node[' + dt['node']['position'] + '] {' + dt['node']['label'] + '} '
-
-        # draw back to our initial entry
-        tmp += '(' + v[0]['coordinate'] + ');\n'
-
-        self.tikz += tmp
-
-    def draw_angle(self,start_position, end_position, mode, label=None, direction=None):
-        tmp = '\\draw (' + str(start_position[0]) + ',' + str(start_position[1]) + ') ' + mode
-        if label is not None and label  != '':
-            tmp += ' node[midway'
-            if direction is not None:
-                tmp += ',' + direction
-            tmp += '] {' + label + '}'
-        tmp += ' (' + str(end_position[0]) + ',' + str(end_position[1]) + ');\n'
-        self.tikz += tmp
 
 class TikzTriangle:
     def __init__(self,constructor):
