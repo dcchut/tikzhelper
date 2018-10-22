@@ -9,14 +9,16 @@
                 <pre class="tikzcode"><code class="language-latex">${tikz2}</code></pre>
             </div>
         </div>
+        <div class="row" tal:condition="e">
+            <div class="col">
+                <div class="alert alert-danger" tal:condition="form.error">
+                    <div class="error-msg-lbl" i18n:translate="">There was a problem with your submission</div>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-6">
                 <p class="font-weight-bold">Define your piecewise function:</p>
-                <div tal:condition="e">
-                    <div class="alert alert-danger" tal:condition="form.error">
-                    <div class="error-msg-lbl" i18n:translate="">There was a problem with your submission</div>
-                    </div>
-                </div>
                 <div class="form-row mb-3">
                     <div class="col-md-4">
                         <label for="interval_type">Interval type</label>
@@ -79,11 +81,17 @@
                         </li>
                     </ul>
                 </div>
-                <div class="form-row mb-3" tal:condition="form['domains'].error or form['functions'].error or form['labels'].error">
-                    <div class="alert alert-warning">
-                        <div class="error-msg-lbl">Your function must be defined.</div>
+                <div class="form-row mb-3" tal:condition="form['domains'].error">
+                    <div class="alert alert-warning" tal:condition="form['domains'].error">
+                        <div class="error-msg-lbl">${form['domains'].errormsg}</div>
                     </div>
                 </div>
+                <div class="form-row mb-3" tal:condition="e">
+                    <div class="alert alert-warning" tal:condition="form.errormsg">
+                        <div class="error-msg-lbl">${form.errormsg}</div>
+                    </div>
+                </div>
+
             </div>
         </div>
         <p class="font-weight-bold">Graphing settings:</p>

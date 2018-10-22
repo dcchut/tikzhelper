@@ -3,6 +3,68 @@ from math import floor, ceil
 
 colors = ['blue', 'red', 'orange', 'purple', 'olive', 'violet']
 
+class ExtendedNumber(object):
+    def __init__(self, n):
+        if n == '∞':
+            self.infinite = 1
+        elif n == '-∞':
+            self.infinite = -1
+        else:
+            self.infinite = 0
+            self.n = float(n)
+
+    def __lt__(self, other):
+        if self.infinite == -1:
+            if other.infinite >= 0:
+                return True
+            else:
+                return False
+
+        if self.infinite == 0:
+            if other.infinite == -1:
+                return False
+            elif other.infinite == 0:
+                return self.n < other.n
+            else:
+                return True
+
+        if self.infinite == 1:
+            return False
+
+    def __le__(self, other):
+        if self.infinite == -1:
+            return True
+
+        if self.infinite == 0:
+            if other.infinite == -1:
+                return False
+            elif other.infinite == 0:
+                return self.n <= other.n
+            else:
+                return True
+
+        if self.infinite == 1:
+            if other.infinite <= 0:
+                return False
+            else:
+                return True
+
+# reorder domains according to the left endpoint
+def order_by_domains(domains,functions,labels):
+    packed = [[domains[k], functions[k], labels[k]] for k in range(0,len(domains))]
+
+    packed.sort(key = lambda x: ExtendedNumber(x[0][1]))
+
+    new_domains = []
+    new_functions = []
+    new_labels = []
+
+    for row in packed:
+        new_domains.append(row[0])
+        new_functions.append(row[1])
+        new_labels.append(row[2])
+
+    return (new_domains, new_functions, new_labels)
 
 def format_domain(domain, min_x, max_x, variable='x'):
     l_sep = '<' if domain[0] == '(' else '\leq'
