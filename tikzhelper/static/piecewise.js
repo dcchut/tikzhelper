@@ -193,6 +193,7 @@ $(document).ready(function(){
             $("#fn_listentry_empty").show().toggleClass('d-flex');
         }
 
+        update_hidden_vars();
         update_url();
     });
 
