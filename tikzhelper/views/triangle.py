@@ -36,7 +36,8 @@ class TriangleView(TabbedView):
 
         # define local variables
         view['tikz'] = ''
-        view['e'] = ''
+        view['e'] = None
+        view['form'] = form
 
         # try to validate their submission
         if self.request.method == 'POST' and 'submit' in self.request.POST:
@@ -60,5 +61,4 @@ class TriangleView(TabbedView):
             except deform.exception.ValidationFailure as e:
                 view['e'] = e
 
-        view['form'] = form
         return view

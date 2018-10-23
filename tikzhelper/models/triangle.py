@@ -1,7 +1,8 @@
 import colander
 from tikzhelper.helpers.widget import FancyCheckboxInput
 
-class TriangleSchema(colander.MappingSchema):
+
+class TriangleSchema(colander.Schema):
     a = colander.SchemaNode(colander.Float(),
                             validator=colander.Range(min=0,
                                                      min_err='Side length must be positive'),

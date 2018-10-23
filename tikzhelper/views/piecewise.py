@@ -6,6 +6,8 @@ from tikzhelper.helpers.tikz import draw_piecewise_fn_definition, draw_piecewise
 import json
 import deform
 
+deform.Field
+
 class PiecewiseView(TabbedView):
     def __init__(self, request):
         self.request = request

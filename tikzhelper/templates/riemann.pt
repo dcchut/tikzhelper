@@ -1,5 +1,126 @@
 <div metal:use-macro="load: layout.pt">
     <div metal:fill-slot="content" class="content">
-        <p>TBC</p>
+        <div class="row" tal:condition="e">
+            <div class="col">
+                <div class="alert alert-danger" tal:condition="form.error">
+                    <div class="error-msg-lbl" i18n:translate="">There was a problem with your submission</div>
+                </div>
+            </div>
+        </div>
+        <form method="POST"
+              action="${request.route_url('riemann')}">
+            <div class="row">
+                <div class="form-row col-md-6">
+                    <p class="font-weight-bold">Function settings:</p>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                    <div class="col-md-6">
+                        <label for="${form['function'].oid}">Formula</label>
+                        ${structure:form['function'].serialize()}
+                        <small class="form-text text-muted">Formula must be written in terms of \x, e.g. (\x)+sqrt(25-(\x)^2)</small>
+                     </div>
+            </div>
+            <div class="form-row mb-3" tal:condition="form['function'].error">
+                <div class="alert alert-warning">
+                    <div class="error-msg-lbl">${form['function'].errormsg}</div>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                    <div class="col-md-6">
+                        <label for="${form['label'].oid}">Label</label>
+                        ${structure:form['label'].serialize()}
+                        <small class="form-text text-muted">Use standard latex notation, e.g. x + \sqrt{25-x^2}</small>
+                     </div>
+            </div>
+            <div class="form-row mb-3" tal:condition="form['label'].error">
+                <div class="alert alert-warning">
+                    <div class="error-msg-lbl">${form['label'].errormsg}</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-row col-md-6">
+                    <p class="font-weight-bold">Graphing settings:</p>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-3">
+                            <label for="${form['n'].oid}">Number of rectangles:</label>
+                            ${structure:form['n'].serialize()}
+                            <small class="form-text text-muted">Number of rectangles to use in your Riemann sum.</small>
+                </div>
+            </div>
+            <div class="form-row mb-3" tal:condition="form['n'].error">
+                <div class="alert alert-warning">
+                    <div class="error-msg-lbl">${form['n'].errormsg}</div>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-3">
+                            <label for="${form['a'].oid}">a:</label>
+                            ${structure:form['a'].serialize()}
+                            <small class="form-text text-muted">The left endpoint of your interval.</small>
+                </div>
+                <div class="col-md-3">
+                            <label for="${form['b'].oid}">b:</label>
+                            ${structure:form['b'].serialize()}
+                            <small class="form-text text-muted">The right endpoint of your interval.</small>
+                </div>
+            </div>
+            <div class="form-row mb-3" tal:condition="form['a'].error or form['b'].error">
+                <div class="col-md-3">
+                    <div class="alert alert-warning" tal:condition="form['a'].error">
+                        <div class="error-msg-lbl">${form['a'].errormsg}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="alert alert-warning" tal:condition="form['b'].error">
+                        <div class="error-msg-lbl">${form['b'].errormsg}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row mb-3">
+                <div class="col-md-3">
+                            <label for="${form['min_x'].oid}">Min x:</label>
+                            ${structure:form['min_x'].serialize()}
+                            <small class="form-text text-muted">The minimum x-value to display on our graph.</small>
+                </div>
+                <div class="col-md-3">
+                            <label for="${form['max_x'].oid}">Max x:</label>
+                            ${structure:form['max_x'].serialize()}
+                            <small class="form-text text-muted">The maximum x-value to display on our graph.</small>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-3">
+                            <label for="${form['min_y'].oid}">Min y:</label>
+                            ${structure:form['min_y'].serialize()}
+                            <small class="form-text text-muted">The minimum y-value to display on our graph.</small>
+                </div>
+                <div class="col-md-3">
+                            <label for="${form['max_y'].oid}">Max y:</label>
+                            ${structure:form['max_y'].serialize()}
+                            <small class="form-text text-muted">The maximum y-value to display on our graph.</small>
+                </div>
+            </div>
+            <div class="form-row mb-3" tal:condition="form['min_x'].error or form['max_x'].error">
+                <div class="col-md-3">
+                    <div class="alert alert-warning" tal:condition="form['min_x'].error">
+                        <div class="error-msg-lbl">${form['min_x'].errormsg}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="alert alert-warning" tal:condition="form['max_x'].error">
+                        <span class="error-msg-lbl">${form['max_x'].errormsg}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-3">
+                    <input type="submit" name="submit" value="Generate" class="btn btn-primary">
+                </div>
+            </div>
+        </form>
     </div>
 </div>

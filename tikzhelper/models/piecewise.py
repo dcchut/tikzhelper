@@ -120,6 +120,7 @@ def validate_domains(node, value, **kwargs):
     except ValueError as e:
         raise colander.Invalid(node, "TT")
 
+
 class PiecewiseSchema(colander.Schema):
     domains = colander.SchemaNode(colander.String(),
                                   validator=validate_domains)

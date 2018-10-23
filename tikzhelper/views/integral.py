@@ -14,7 +14,7 @@ class IntegralView(TabbedView):
         return view
 
     @view_config(route_name='integral', renderer='../templates/integral.pt')
-    def piecewise(self):
+    def integral(self):
         view = self.get_view()
 
         return view

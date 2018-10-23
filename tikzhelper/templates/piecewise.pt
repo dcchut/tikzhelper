@@ -102,25 +102,25 @@
                 <input type="hidden" id="fn_form_functions" name="functions" value="" />
                 <input type="hidden" id="fn_form_labels" name="labels" value="" />
             <div class="form-row mb-3">
-                <div class="col-md-4">
-                            <label for="min_x">Min x:</label>
+                <div class="col-md-3">
+                            <label for="${form['min_x'].oid}">Min x:</label>
                             ${structure:form['min_x'].serialize()}
                             <small class="form-text text-muted">The minimum x-value to display on our graph.</small>
                 </div>
-                <div class="col-md-4">
-                            <label for="max">Max x:</label>
+                <div class="col-md-3">
+                            <label for="${form['max_x'].oid}">Max x:</label>
                             ${structure:form['max_x'].serialize()}
                             <small class="form-text text-muted">The maximum x-value to display on our graph.</small>
                 </div>
             </div>
 
             <div class="form-row mb-3" tal:condition="form['min_x'].error or form['max_x'].error">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="alert alert-warning" tal:condition="form['min_x'].error">
                         <div class="error-msg-lbl">${form['min_x'].errormsg}</div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="alert alert-warning" tal:condition="form['max_x'].error">
                         <span class="error-msg-lbl">${form['max_x'].errormsg}</span>
                     </div>
@@ -128,32 +128,32 @@
             </div>
 
             <div class="form-row mb-3">
-                <div class="col-md-4">
-                            <label for="min_y">Min y:</label>
+                <div class="col-md-3">
+                            <label for="${form['min_y'].oid}">Min y:</label>
                             ${structure:form['min_y'].serialize()}
                             <small class="form-text text-muted">The minimum y-value to display on our graph.</small>
                 </div>
-                <div class="col-md-4">
-                            <label for="max_y">Max y:</label>
+                <div class="col-md-3">
+                            <label for="${form['max_y'].oid}">Max y:</label>
                             ${structure:form['max_y'].serialize()}
                             <small class="form-text text-muted">The maximum y-value to display on our graph.</small>
                 </div>
             </div>
 
             <div class="form-row mb-3" tal:condition="form['min_y'].error or form['max_y'].error">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="alert alert-warning" tal:condition="form['min_y'].error">
                         <div class="error-msg-lbl">${form['min_y'].errormsg}</div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="alert alert-warning" tal:condition="form['max_y'].error">
                         <span class="error-msg-lbl">${form['max_y'].errormsg}</span>
                     </div>
                 </div>
             </div>
 
-            <div class="form-row">
+            <div class="form-row mb-3">
                 <div class="col-md-3">
                     <input type="submit" name="submit" value="Generate" class="btn btn-primary">
                 </div>
