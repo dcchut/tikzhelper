@@ -14,6 +14,9 @@ class RiemannSchema(colander.Schema):
     max_x = colander.SchemaNode(colander.Float(), default=5)
     min_y = colander.SchemaNode(colander.Float(), default=-5)
     max_y = colander.SchemaNode(colander.Float(), default=5)
+    sample_pos = colander.SchemaNode(colander.Float(),
+                              default=0.5,
+                              validator=colander.Range(0,1))
 
     n = colander.SchemaNode(colander.Integer(), default=4, validator=Positive)
     a = colander.SchemaNode(colander.Float())

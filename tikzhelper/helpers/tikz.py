@@ -42,6 +42,54 @@ class TikzBuilder:
         tmp += ' (' + str(end_position[0]) + ',' + str(end_position[1]) + ');\n'
         self.tikz += tmp
 
+    def draw_axes(self,min_x,max_x,min_y,max_y, fn_variable):
+        tmp = f'\\draw[<->,thick] ({min_x},0) -- ({max_x},0) coordinate (x axis) node[right] ' + '{$' + fn_variable + '$};\n'
+        tmp += f'\\draw[<->,thick] (0,{min_y}) -- (0, {max_y}) coordinate (y axis) node[above] ' + '{$y$};\n'
+
+        self.tikz += tmp
+
+def draw_riemann_graph(a,b,n, sample_pos, label, function, min_x, max_x,min_y, max_y, fn_variable='x'):
+    builder = TikzBuilder()
+
+    builder.simple_tag('usepackage', 'tikz')
+    builder.simple_tag('usetikzlibrary', 'backgrounds')
+    builder.tikz += '\n'
+
+    builder.simple_tag('begin', 'center')
+    builder.simple_tag('begin','tikzpicture')
+
+    # draw our coordinate axes
+    builder.draw_axes(min_x=min_x,max_x=max_x,min_y=min_y,max_y=max_y, fn_variable=fn_variable)
+
+    # compute our sample points
+    delta = (b - a) / n
+
+    delta_l = delta * sample_pos
+    delta_r = delta - delta_l
+
+    sample_points = [str(a + (delta * (i + delta_l))) for i in range(0,n)]
+
+    builder.tikz += '\\begin{scope}[on background layer]\n'
+
+    # draw the rectangles
+    builder.tikz += '\\foreach \\x in {' + ','.join(sample_points) + '} {\\pgfmathparse{' + function + '} \\pgfmathresult\n';
+    builder.tikz += f'\\draw[fill=blue!20] (\\x-{delta_l},\\pgfmathresult |- x axis) -- \n'
+    builder.tikz += f'(\\x-{delta_l},\\pgfmathresult) -- (\\x+{delta_r},\\pgfmathresult) -- '
+    builder.tikz += f'(\\x+{delta_r},\\pgfmathresult |- x axis) -- cycle;' + '}\n'
+
+    # label a and b on the graph
+    builder.tikz += f'\\node at ({a},-5pt) ' + '{\\footnotesize{$a$}};\n'
+    builder.tikz += f'\\node at ({b},-5pt) ' + '{\\footnotesize{$b$}};\n'
+
+    builder.tikz += f'\\draw[<->,blue,ultra thick,smooth,samples=100,domain={a}:{b}] plot(\\x,' + '{' + function + '});\n'
+
+    builder.tikz += '\\end{scope}\n'
+
+    # close open tags
+    builder.simple_tag('end', 'tikzpicture')
+    builder.simple_tag('end', 'center')
+
+    return builder.tikz
 
 def draw_piecewise_fn_definition(domains, labels, fn_name='f', fn_variable='x',
                                  colors=['blue', 'red', 'orange', 'purple', 'olive', 'violet']):
@@ -73,16 +121,22 @@ def draw_piecewise_fn_graph(domains, functions, min_x, max_x, min_y, max_y, fn_n
                             colors=['blue', 'red', 'orange', 'purple', 'olive', 'violet']):
     builder = TikzBuilder()
 
+    # required libraries
+    builder.simple_tag('usepackage', 'tikz')
+    builder.simple_tag('usepackage', 'mathtools')
+    builder.tikz += '\n'
+
     builder.simple_tag('begin', 'center')
     # makes a \filledcirc tex command to create a filled circle
     builder.tikz += '\\newcommand\\filledcirc{{\\color{white}\\bullet}\\mathllap{\\circ}}\n'
 
     builder.simple_tag('begin', 'tikzpicture', {'scale' : 1})
 
-    # draw the coordinate axes
+    # craw the coordinate axes
+    builder.draw_axes(min_x=min_x,max_x=max_x,min_y=min_y,max_y=max_y, fn_variable=fn_variable)
+
+    # draw a handy-dandy grid
     builder.tikz += f'\\draw[help lines] ({min_x},{min_y}) grid ({max_x},{max_y});\n'
-    builder.tikz += f'\\draw[<->] ({min_x},0)--({max_x},0) node[right]' + '{$' + fn_variable + '$};\n'
-    builder.tikz += f'\\draw[<->] (0,{min_y})--(0,{max_y}) node[above]' + '{$y$};\n'
 
     # we want our axis labels to be integers, so we truncate min/max x/y
     # in the appropriate direction
@@ -93,17 +147,11 @@ def draw_piecewise_fn_graph(domains, functions, min_x, max_x, min_y, max_y, fn_n
     max_y = floor(max_y)
 
     # draw x-axis labels
-    builder.tikz += '\\foreach \\x in {' + ','.join([str(x) for x in range(min_x,max_x+1)]) + '} {\\draw (\\x, 0)'
+    builder.tikz += '\\foreach \\x in {' + ','.join([str(x) for x in range(min_x,max_x+1) if x != 0]) + '} {\\draw (\\x, 0)'
     builder.tikz += ' node[below]{\\small{$\\x$}};}\n'
 
     # draw y-axis labels
-    # we have to be careful here to not draw another label at 0, if we already did that
-    if 0 in range(min_x, max_x+1):
-        y_points = [str(y) for y in range(min_y, max_y+1) if y != 0]
-    else:
-        y_points = [str(y) for y in range(min_y, max_y+1)]
-
-    builder.tikz += '\\foreach \\y in {' + ','.join(y_points) + '} {\\draw (0,\\y)'
+    builder.tikz += '\\foreach \\y in {' + ','.join([str(y) for y in range(min_y,max_y+1) if y != 0]) + '} {\\draw (0,\\y)'
     builder.tikz += ' node[left]{\\small{$\\y$}};}\n'
 
     # now draw each section of the graph
@@ -114,21 +162,21 @@ def draw_piecewise_fn_graph(domains, functions, min_x, max_x, min_y, max_y, fn_n
         curr_color = colors[k % len(colors)]
         builder.simple_tag('color', curr_color)
 
-        builder.tikz += '\\draw[ultra thick'
+        builder.tikz += '\\draw['
 
         # draw arrows as appropriate
         if k == 0 and length == 1:
-            builder.tikz += ',<->'
+            builder.tikz += '<->'
         elif k == 0:
-            builder.tikz += ',<-'
+            builder.tikz += '<-'
         elif k == length - 1:
-            builder.tikz += ',->'
+            builder.tikz += '->'
         else:
-            builder.tikz += ',-'
+            builder.tikz += '-'
 
-        builder.tikz += '] plot [domain = '
-        builder.tikz += str(domains[k][1]) + ':' + str(domains[k][2]) + ', samples=100]'
-        builder.tikz += ' (\\x,{' + str(functions[k]) + '});\n'
+        builder.tikz += ',ultra thick,smooth,samples=100,domain='
+        builder.tikz += str(domains[k][1]) + ':' + str(domains[k][2]) + '] plot'
+        builder.tikz += '(\\x,{' + str(functions[k]) + '});\n'
 
         # add a right endpoint
         if k < length - 1:

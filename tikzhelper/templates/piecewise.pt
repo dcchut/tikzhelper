@@ -3,10 +3,10 @@
         <div tal:condition="tikz and tikz2" class="mb-4">
             <p class="font-weight-bold">Generated code:</p>
             <div class="bd-highlight">
-                <pre class="tikzcode"><code class="language-latex">${tikz}</code></pre>
+                <pre><code class="language-latex">${tikz}</code></pre>
             </div>
             <div class="bd-highlight">
-                <pre class="tikzcode"><code class="language-latex">${tikz2}</code></pre>
+                <pre><code class="language-latex">${tikz2}</code></pre>
             </div>
         </div>
         <div class="row" tal:condition="e">
