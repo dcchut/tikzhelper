@@ -1,101 +1,50 @@
-from tikzhelper.helpers.triangle import TikzBuilder
-from math import floor, ceil
+from math import cos, sin, ceil, floor
 
-colors = ['blue', 'red', 'orange', 'purple', 'olive', 'violet']
 
-class ExtendedNumber(object):
-    def __init__(self, n):
-        if n == '∞':
-            self.infinite = 1
-        elif n == '-∞':
-            self.infinite = -1
-        else:
-            self.infinite = 0
-            self.n = float(n)
+class TikzBuilder:
+    def __init__(self):
+        self.tikz = ''
 
-    def __lt__(self, other):
-        if self.infinite == -1:
-            if other.infinite >= 0:
-                return True
-            else:
-                return False
+    def simple_tag(self,op,v,options=None,newline=True):
+        tmp = '\\' + op + '{' + v + '}'
+        if options is not None:
+            tmp += '['
+            for k in options:
+                tmp += k + '=' + str(options[k])
+            tmp += ']'
+        self.tikz += tmp
+        if newline:
+            self.tikz += '\n'
 
-        if self.infinite == 0:
-            if other.infinite == -1:
-                return False
-            elif other.infinite == 0:
-                return self.n < other.n
-            else:
-                return True
+    def coordinate(self, label, coordinates):
+        self.tikz += '\\coordinate (' + label + ') at (' + str(coordinates[0]) + 'cm,' + str(coordinates[1]) + 'cm);\n'
 
-        if self.infinite == 1:
-            return False
+    def draw_cycle(self,v):
+        tmp = '\\draw '
 
-    def __le__(self, other):
-        if self.infinite == -1:
-            return True
+        for dt in v:
+            tmp += '(' + dt['coordinate'] + ') -- '
+            if 'node' in dt:
+                tmp += 'node[' + dt['node']['position'] + '] {' + dt['node']['label'] + '} '
 
-        if self.infinite == 0:
-            if other.infinite == -1:
-                return False
-            elif other.infinite == 0:
-                return self.n <= other.n
-            else:
-                return True
+        # draw back to our initial entry
+        tmp += '(' + v[0]['coordinate'] + ');\n'
 
-        if self.infinite == 1:
-            if other.infinite <= 0:
-                return False
-            else:
-                return True
+        self.tikz += tmp
 
-# reorder domains according to the left endpoint
-def order_by_domains(domains,functions,labels):
-    packed = [[domains[k], functions[k], labels[k]] for k in range(0,len(domains))]
+    def draw_angle(self,start_position, end_position, mode, label=None, direction=None):
+        tmp = '\\draw (' + str(start_position[0]) + ',' + str(start_position[1]) + ') ' + mode
+        if label is not None and label  != '':
+            tmp += ' node[midway'
+            if direction is not None:
+                tmp += ',' + direction
+            tmp += '] {' + label + '}'
+        tmp += ' (' + str(end_position[0]) + ',' + str(end_position[1]) + ');\n'
+        self.tikz += tmp
 
-    packed.sort(key = lambda x: ExtendedNumber(x[0][1]))
 
-    new_domains = []
-    new_functions = []
-    new_labels = []
-
-    for row in packed:
-        new_domains.append(row[0])
-        new_functions.append(row[1])
-        new_labels.append(row[2])
-
-    return (new_domains, new_functions, new_labels)
-
-def format_domain(domain, min_x, max_x, variable='x'):
-    l_sep = '<' if domain[0] == '(' else '\leq'
-    r_sep = '<' if domain[-1] == ')' else '\leq'
-
-    inner = domain[1:-1].split(',')
-
-    l_endpoint = inner[0]
-    r_endpoint = inner[1]
-    l_filled = False if l_sep == '<' else True
-    r_filled = False if r_sep == '<' else True
-
-    if l_endpoint == '-∞' and r_endpoint == '∞':
-        r = f'-\infty < {variable} < \infty'
-    elif l_endpoint == '-∞':
-        r = f'{variable} {r_sep} {r_endpoint}'
-    elif r_endpoint == '∞':
-        sep = '>' if domain[0] == '(' else '\geq'
-        r = f'{variable} {sep} {l_endpoint}'
-    else:
-        r = f'{l_endpoint} {l_sep} {variable} {r_sep} {r_endpoint}'
-
-    # if we have infinite endpoints, truncate them at min/max x/y
-    if l_endpoint == '-∞' or l_endpoint == '∞':
-        l_endpoint = min_x
-    if r_endpoint == '-∞' or r_endpoint == '∞':
-        r_endpoint = max_x
-
-    return (r, l_endpoint, r_endpoint, l_filled, r_filled)
-
-def draw_piecewise_fn_definition(domains, labels, fn_name='f', fn_variable='x'):
+def draw_piecewise_fn_definition(domains, labels, fn_name='f', fn_variable='x',
+                                 colors=['blue', 'red', 'orange', 'purple', 'olive', 'violet']):
     builder = TikzBuilder()
 
     builder.tikz += f"{fn_name}({fn_variable})="
@@ -120,7 +69,8 @@ def draw_piecewise_fn_definition(domains, labels, fn_name='f', fn_variable='x'):
 
     return builder.tikz
 
-def draw_piecewise_fn_graph(domains, functions, min_x, max_x, min_y, max_y, fn_name='f', fn_variable='x'):
+def draw_piecewise_fn_graph(domains, functions, min_x, max_x, min_y, max_y, fn_name='f', fn_variable='x',
+                            colors=['blue', 'red', 'orange', 'purple', 'olive', 'violet']):
     builder = TikzBuilder()
 
     builder.simple_tag('begin', 'center')

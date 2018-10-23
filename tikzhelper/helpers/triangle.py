@@ -1,5 +1,5 @@
 from math import sqrt, cos, sin, pi, acos
-from tikzhelper.helpers.tikzbuilder import TikzBuilder
+from tikzhelper.helpers.tikz import TikzBuilder
 
 class Triangle:
     # construct a triangle with SAS (A,theta,B)

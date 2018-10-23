@@ -1,75 +1,10 @@
 from pyramid.view import view_config
 from tikzhelper.views.tabbedview import TabbedView
-from tikzhelper.helpers.piecewise import ExtendedNumber, order_by_domains, draw_piecewise_fn_definition, draw_piecewise_fn_graph, format_domain
+from tikzhelper.models.piecewise import PiecewiseSchema, order_by_domains, format_domain
+from tikzhelper.helpers.tikz import draw_piecewise_fn_definition, draw_piecewise_fn_graph
 
 import json
-import colander
 import deform
-import re
-
-def validate_json(node, value, **kwargs):
-    try:
-        js = json.loads(value)
-    except ValueError as e:
-        raise colander.Invalid(node, "Not in JSON format")
-
-def validate_domains(node, value, **kwargs):
-    try:
-        js = json.loads(value)
-        # now verify each entry in value against our regex
-        for d in js:
-            if re.match('[\(\[][-]?(?:(?:\d*\.\d+)|(?:\d+\.?)|∞),[-]?(?:(?:\d*\.\d+)|(?:\d+\.?)|∞)[\)\]]',
-                        d) is None:
-                raise colander.Invalid(node,"TF")
-
-            # for each domain, determine whether the left endpoint is less than the right endpoint
-            dom = d[1:-1].split(',')
-            if not ExtendedNumber(dom[0]) <= ExtendedNumber(dom[1]):
-                raise colander.Invalid(node,"Invalid domain specification")
-
-    except ValueError as e:
-        raise colander.Invalid(node, "TT")
-
-class PiecewiseSchema(colander.Schema):
-    domains = colander.SchemaNode(colander.String(),
-                                  validator=validate_domains)
-    functions = colander.SchemaNode(colander.String(),
-                                    validator=validate_json)
-    labels = colander.SchemaNode(colander.String(),
-                                 validator=validate_json)
-
-    min_x = colander.SchemaNode(colander.Float(),
-                                default=-5.0)
-    max_x = colander.SchemaNode(colander.Float(),
-                                default=5.0)
-    min_y = colander.SchemaNode(colander.Float(),
-                                default=-5.0)
-    max_y = colander.SchemaNode(colander.Float(),
-                                default=5.0)
-
-    def validator(self, form, values):
-        # we want all three lists to have the same length
-        # and for them to be nonempty
-        a = len(json.loads(values['domains']))
-        b = len(json.loads(values['functions']))
-        c = len(json.loads(values['labels']))
-
-        # todo: find out how to pass a form node to colander.Invalid
-        # currently it seems like I can't force the error on the domains node
-        if a != b or a != c or b != c or a == 0:
-            raise colander.Invalid(form, "Invalid piecewise function definition.")
-
-        if values['min_x'] > values['max_x']:
-            e = colander.Invalid(form)
-            e['min_x'] = 'Minimum x-value must be smaller than the maximum x-value'
-
-            raise e
-
-        if values['min_y'] > values['max_y']:
-            e = colander.Invalid(form)
-            e['min_y'] = 'Minimum y-value must be smaller than the maximum y-value'
-
-            raise e
 
 class PiecewiseView(TabbedView):
     def __init__(self, request):
