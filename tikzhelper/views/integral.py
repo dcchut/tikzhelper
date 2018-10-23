@@ -1,7 +1,7 @@
 from pyramid.view import view_config
 
 from tikzhelper.views.tabbedview import TabbedView
-
+from tikzhelper.helpers.tikz import draw_region_between_curves
 
 class IntegralView(TabbedView):
     def __init__(self, request):
@@ -18,5 +18,7 @@ class IntegralView(TabbedView):
     @view_config(route_name='integral', renderer='../templates/integral.pt')
     def integral(self):
         view = self.get_view()
+        view['tikz'] = draw_region_between_curves()
+
 
         return view

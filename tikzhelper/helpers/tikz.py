@@ -1,5 +1,59 @@
 from math import cos, sin, ceil, floor
 
+class MagicTikzBuilder:
+    def __init__(self):
+        self.tikz = ''
+        self.tmp = ''
+
+    def nl(self):
+        self.tmp += '\n'
+        return self
+
+    def free(self, txt):
+        self.tmp += ' {} '.format(txt)
+        return self
+
+    def xy(self, x, y):
+        return self.pr('axis cs:{},{}'.format(x,y))
+
+    def pr(self,txt):
+        self.tmp += '({})'.format(txt)
+        return self
+
+    def sq(self, options, bracket=True):
+        unpacked = []
+        for k in options:
+            if options[k] is None:
+                unpacked.append(k)
+            else:
+                if isinstance(options[k],dict):
+                    unpacked.append('{}={{{}}}'.format(k,self.sq(options[k],False)))
+                else:
+                    unpacked.append('{}={}'.format(k,str(options[k])))
+
+        if not bracket:
+            return ','.join(unpacked)
+        else:
+            self.tmp += '[' + ','.join(unpacked) + ']'
+            return self
+
+    def __getitem__(self, item):
+        self.tmp += '{' + '{}'.format(item) + '}'
+        return self
+
+    def __getattr__(self, name):
+        self.tmp += '\\{}'.format(name)
+        return self
+
+    def __call__(self, line_sep=''):
+        # end the line, concat to overall tikz
+        self.tmp += line_sep
+        self.nl()
+
+        # reset buffer
+        self.tikz += self.tmp
+        self.tmp = ''
+
 
 class TikzBuilder:
     def __init__(self):
@@ -202,5 +256,57 @@ def draw_piecewise_fn_graph(domains, functions, min_x, max_x, min_y, max_y, fn_n
 
     builder.simple_tag('end', 'tikzpicture')
     builder.simple_tag('end', 'center')
+
+    return builder.tikz
+
+def draw_region_between_curves(xmin=-5.5,xmax=5.5,ymin=-5.5,ymax=5.5,a=-3,b=3,f='2*sin(deg(x)+1)+4',g='cos(deg(x))-1',delta=0.0001):
+    builder = MagicTikzBuilder()
+    builder.begin['center']()
+    builder.begin['tikzpicture']()
+    builder.begin['axis'].sq({'axis lines': 'middle',
+                              'xlabel': '$x$',
+                              'ylabel': '$y$',
+                              'enlargelimits': None,
+                              'ytick': '\\empty',
+                              'xtick': '\\empty',
+                              'xmin': xmin,
+                              'xmax': xmax,
+                              'ymin': ymin,
+                              'ymax': ymax})()
+
+    builder.addplot.sq({'-': None,
+                        'blue': None,
+                        'thick': None,
+                        'smooth': None,
+                        'samples': 100,
+                        'domain': '{}:{}'.format(xmin,xmax),
+                        'name path': 'f'})[f](';')
+
+    builder.addplot.sq({'-': None,
+                        'blue': None,
+                        'thick': None,
+                        'smooth': None,
+                        'samples': 100,
+                        'domain': '{}:{}'.format(xmin,xmax),
+                        'name path': 'g'})[g](';')
+
+    builder.addplot.sq({'blue': None, 'opacity': 0.1}).free('fill between').sq(
+        {'of': 'f and g', 'soft clip': {'domain' : '{}:{}'.format(a,b)}})(';')
+
+    # compute path intersections
+    builder.path.sq({'name path': 'v_st'}).xy(a+delta, ymin).free('--').xy(a+delta, ymax)(';')
+    builder.path.sq({'name path': 'v_end'}).xy(b-delta,ymin).free('--').xy(b-delta,ymax)(';')
+    builder.path.sq({'name intersections': {'of': 'f and v_st', 'by': 'f_st'}})(';')
+    builder.path.sq({'name intersections': {'of': 'g and v_st', 'by': 'g_st'}})(';')
+    builder.path.sq({'name intersections': {'of': 'f and v_end', 'by': 'f_end'}})(';')
+    builder.path.sq({'name intersections': {'of': 'g and v_end', 'by': 'g_end'}})(';')
+
+    # draw the dashed left and right borderse
+    builder.draw.sq({'dashed': None}).pr('f_st').free('--').pr('g_st')(';')
+    builder.draw.sq({'dashed': None}).pr('f_end').free('--').pr('g_end')(';')
+
+    builder.end['axis']()
+    builder.end['tikzpicture']()
+    builder.end['center']()
 
     return builder.tikz
