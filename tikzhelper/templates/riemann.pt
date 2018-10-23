@@ -5,6 +5,7 @@
             <div class="bd-highlight">
                 <pre><code class="language-latex">${tikz}</code></pre>
             </div>
+            <a href="${request.route_url('riemann_view', _query = {'json' : json})}">Permanent link</a>
         </div>
         <div class="row" tal:condition="e">
             <div class="col">

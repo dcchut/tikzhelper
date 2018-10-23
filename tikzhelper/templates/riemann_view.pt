@@ -1,0 +1,10 @@
+<div metal:use-macro="load: layout.pt">
+    <div metal:fill-slot="content" class="content">
+        <div class="mb-4">
+            <p class="font-weight-bold">Generated code:</p>
+            <div class="bd-highlight">
+                <pre><code class="language-latex">${tikz}</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
