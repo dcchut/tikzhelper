@@ -1,7 +1,7 @@
 import colander
 
 
-def Positive(node, value, **kwargs):
+def validate_positive(node, value, **kwargs):
     if value <= 0:
         raise colander.Invalid(node, "Must be a positive integer")
 
@@ -18,6 +18,6 @@ class RiemannSchema(colander.Schema):
                               default=0.5,
                               validator=colander.Range(0,1))
 
-    n = colander.SchemaNode(colander.Integer(), default=4, validator=Positive)
+    n = colander.SchemaNode(colander.Integer(), default=4, validator=validate_positive)
     a = colander.SchemaNode(colander.Float())
     b = colander.SchemaNode(colander.Float())

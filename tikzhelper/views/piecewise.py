@@ -1,10 +1,11 @@
-from pyramid.view import view_config
-from tikzhelper.views.tabbedview import TabbedView
-from tikzhelper.models.piecewise import PiecewiseSchema, order_by_domains, format_domain
-from tikzhelper.helpers.tikz import draw_piecewise_fn_definition, draw_piecewise_fn_graph
-
 import json
+
 import deform
+from pyramid.view import view_config
+
+from tikzhelper.helpers.tikz import draw_piecewise_fn_definition, draw_piecewise_fn_graph
+from tikzhelper.models.piecewise import PiecewiseSchema, order_by_domains, format_domain
+from tikzhelper.views.tabbedview import TabbedView
 
 
 class PiecewiseView(TabbedView):

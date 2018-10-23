@@ -1,5 +1,7 @@
 from pyramid.view import view_config
+
 from tikzhelper.views.tabbedview import TabbedView
+
 
 class IntegralView(TabbedView):
     def __init__(self, request):

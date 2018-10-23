@@ -1,11 +1,13 @@
-from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
-from tikzhelper.views.tabbedview import TabbedView
-from tikzhelper.models.riemann import RiemannSchema
-from tikzhelper.helpers.tikz import draw_riemann_graph
-import deform
 import json
-from peppercorn import parse
+
+import deform
+from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
+from pyramid.view import view_config
+
+from tikzhelper.helpers.tikz import draw_riemann_graph
+from tikzhelper.models.riemann import RiemannSchema
+from tikzhelper.views.tabbedview import TabbedView
+
 
 class RiemannView(TabbedView):
     def __init__(self, request):

@@ -1,9 +1,10 @@
-from pyramid.view import view_config
-from tikzhelper.views.tabbedview import TabbedView
 import deform
+from pyramid.view import view_config
 
 from tikzhelper.helpers.triangle import draw_triangle
 from tikzhelper.models.triangle import TriangleSchema
+from tikzhelper.views.tabbedview import TabbedView
+
 
 class TriangleView(TabbedView):
     def __init__(self, request):
