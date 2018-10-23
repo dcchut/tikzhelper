@@ -6,7 +6,6 @@ from tikzhelper.helpers.tikz import draw_piecewise_fn_definition, draw_piecewise
 import json
 import deform
 
-deform.Field
 
 class PiecewiseView(TabbedView):
     def __init__(self, request):
@@ -35,7 +34,7 @@ class PiecewiseView(TabbedView):
 
         view['tikz'] = ''
         view['tikz2'] = ''
-        view['e'] = ''
+        view['e'] = None
 
         form = deform.Form(self.schema, buttons=('submit',))
 
@@ -69,4 +68,5 @@ class PiecewiseView(TabbedView):
                 view['e'] = e
 
         view['form'] = form
+
         return view
