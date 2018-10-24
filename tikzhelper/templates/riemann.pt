@@ -52,30 +52,6 @@
             </div>
             <div class="form-row mb-3">
                 <div class="col-md-3">
-                            <label for="${form['n'].oid}">Number of rectangles:</label>
-                            ${structure:form['n'].serialize()}
-                            <small class="form-text text-muted">Number of rectangles to use in your Riemann sum.</small>
-                </div>
-                <div class="col-md-3">
-                            <label for="${form['sample_pos'].oid}">Sample point position:</label>
-                            ${structure:form['sample_pos'].serialize()}
-                            <small class="form-text text-muted">Specify a number between 0 and 1 to determine where we take our sample points.</small>
-                </div>
-            </div>
-            <div class="form-row mb-3" tal:condition="form['n'].error or form['sample_pos'].error">
-                <div class="col-md-3">
-                    <div class="alert alert-warning" tal:condition="form['n'].error">
-                        <div class="error-msg-lbl">${form['n'].errormsg}</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="alert alert-warning" tal:condition="form['sample_pos'].error">
-                        <div class="error-msg-lbl">${form['sample_pos'].errormsg}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-row mb-3">
-                <div class="col-md-3">
                             <label for="${form['a'].oid}">a:</label>
                             ${structure:form['a'].serialize()}
                             <small class="form-text text-muted">The left endpoint of your interval.</small>
@@ -98,7 +74,30 @@
                     </div>
                 </div>
             </div>
-
+            <div class="form-row mb-3">
+                <div class="col-md-3">
+                            <label for="${form['n'].oid}">Number of rectangles:</label>
+                            ${structure:form['n'].serialize()}
+                            <small class="form-text text-muted">Number of rectangles to use in your Riemann sum.</small>
+                </div>
+                <div class="col-md-3">
+                            <label for="${form['sample_pos'].oid}">Sample point position:</label>
+                            ${structure:form['sample_pos'].serialize()}
+                            <small class="form-text text-muted">Specify a number between 0 and 1 to determine where we take our sample points.</small>
+                </div>
+            </div>
+            <div class="form-row mb-3" tal:condition="form['n'].error or form['sample_pos'].error">
+                <div class="col-md-3">
+                    <div class="alert alert-warning" tal:condition="form['n'].error">
+                        <div class="error-msg-lbl">${form['n'].errormsg}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="alert alert-warning" tal:condition="form['sample_pos'].error">
+                        <div class="error-msg-lbl">${form['sample_pos'].errormsg}</div>
+                    </div>
+                </div>
+            </div>
             <div class="form-row mb-3">
                 <div class="col-md-3">
                             <label for="${form['min_x'].oid}">Min x:</label>
@@ -133,6 +132,16 @@
                     <div class="alert alert-warning" tal:condition="form['max_x'].error">
                         <span class="error-msg-lbl">${form['max_x'].errormsg}</span>
                     </div>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-3">
+                            ${structure:form['draw_grid'].serialize()}
+                            <small class="form-text text-muted">Whether to draw axis gridlines.</small>
+                </div>
+                <div class="col-md-3">
+                            ${structure:form['draw_labels'].serialize()}
+                            <small class="form-text text-muted">Whether to draw axis labels.</small>
                 </div>
             </div>
             <div class="form-row">

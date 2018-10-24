@@ -107,40 +107,37 @@ class TikzBuilder:
         self.tikz += tmp
 
 
-def draw_axes(builder, min_x, max_x, min_y, max_y, draw_xticks=True, draw_yticks=True, draw_grid=False):
-    if draw_xticks:
-        xticks = '{' + ','.join([str(x) for x in range(ceil(min_x), floor(max_x)) if x != 0]) + '}'
-    else:
-        xticks = '\\empty'
-
-    if draw_yticks:
-        yticks = '{' + ','.join([str(y) for y in range(ceil(min_y), floor(max_y)) if y != 0]) + '}'
-    else:
-        yticks = '\\empty'
+def draw_axes(builder, min_x, max_x, min_y, max_y, draw_grid=False, draw_labels=False):
+    xticks = '{' + ','.join([str(x) for x in range(ceil(min_x), floor(max_x)) if x != 0]) + '}'
+    yticks = '{' + ','.join([str(y) for y in range(ceil(min_y), floor(max_y)) if y != 0]) + '}'
 
     options = {'axis lines': 'middle',
                               'xlabel': '$x$',
                               'ylabel': '$y$',
-                              'xticklabels' : {},
-                              'yticklabels' : {},
+                              'xticklabel style' : {'font' : '\\tiny', 'yshift' : '0.5ex'},
+                              'yticklabel style' : {'font' : '\\tiny', 'xshift' : '0.5ex'},
                               'xmin': min_x,
                               'xmax': max_x,
                               'ymin': min_y,
-                              'ymax': max_y}
+                              'ymax': max_y,
+                              'xtick' : xticks,
+                              'ytick' : yticks}
 
     # optionally add a grid to our axes
     # drawing a grid overrides any x/y tick settings
     if draw_grid:
         options['grid'] = 'both'
         options['minor tick num'] = 1
-    else:
-        options['xtick'] = xticks
-        options['ytick'] = yticks
+
+    # optionally draw axis labels
+    if not draw_labels:
+        options['xticklabels'] = {}
+        options['yticklabels'] = {}
 
     builder.begin['axis']._sq(options)()
 
 
-def draw_riemann_graph(a,b,n, sample_pos, label, function, min_x, max_x,min_y, max_y):
+def draw_riemann_graph(a,b,n, sample_pos, label, function, min_x, max_x,min_y, max_y, draw_grid, draw_labels):
     builder = MagicTikzBuilder()
 
     builder.begin['center']()
@@ -151,7 +148,9 @@ def draw_riemann_graph(a,b,n, sample_pos, label, function, min_x, max_x,min_y, m
               min_x=min_x,
               max_x=max_x,
               min_y=min_y,
-              max_y=max_y)
+              max_y=max_y,
+              draw_grid=draw_grid,
+              draw_labels=draw_labels)
 
     # compute our sample points
     delta = (b-a)/n
@@ -170,9 +169,10 @@ def draw_riemann_graph(a,b,n, sample_pos, label, function, min_x, max_x,min_y, m
     builder._xy('#1-{}'.format(delta_l),'{{{}}}'.format(pgfplots_function))._raw(' -- cycle')(';')
     builder._raw('}')()
 
-    # label a and b on the graph
-    builder.node._sq({'below' : None})._free('at')._xy(a,0)._raw('{\\footnotesize{$a$}}')(';')
-    builder.node._sq({'below' : None})._free('at')._xy(b,0)._raw('{\\footnotesize{$b$}}')(';')
+    # label a and b on the graph if we don't already have axis labels
+    if not draw_labels:
+        builder.node._sq({'below' : None})._free('at')._xy(a,0)._raw('{\\footnotesize{$a$}}')(';')
+        builder.node._sq({'below' : None})._free('at')._xy(b,0)._raw('{\\footnotesize{$b$}}')(';')
 
     # now plot our function
     builder.addplot._sq({'<->' : None,
@@ -207,15 +207,11 @@ def draw_piecewise_fn_definition(domains, labels,
 
     return builder.tikz
 
-def draw_piecewise_fn_graph(domains, functions, min_x, max_x, min_y, max_y, fn_name='f', fn_variable='x',
+def draw_piecewise_fn_graph(domains, functions, min_x, max_x, min_y, max_y, draw_grid, draw_labels,
                             colors=['blue', 'red', 'orange', 'purple', 'olive', 'violet']):
     builder = MagicTikzBuilder()
-    #builder.usepackage['tikz']()
-    #builder.usepackage['mathtools']()
-    #builder()
 
     builder.begin['center']()
-    builder.newcommand.filledcirc._raw('{{\\color{white}\\bullet}\\mathllap{\\circ}}')()
     builder.begin['tikzpicture']()
 
     draw_axes(builder=builder,
@@ -223,7 +219,8 @@ def draw_piecewise_fn_graph(domains, functions, min_x, max_x, min_y, max_y, fn_n
               max_x=max_x,
               min_y=min_y,
               max_y=max_y,
-              draw_grid=True)
+              draw_grid=draw_grid,
+              draw_labels=draw_labels)
 
     # now draw each section of the graph
     length = len(domains)
@@ -248,26 +245,26 @@ def draw_piecewise_fn_graph(domains, functions, min_x, max_x, min_y, max_y, fn_n
                              'samples': 100,
                              'domain': '{}:{}'.format(domains[k][1],domains[k][2])})[functions[k]](';')
         # we have to change from x to #1 to satisfy pgfplots needs
-        pgfplots_function = functions[k].replace('x', '#1')
+        pgfplots_function = '{' + functions[k].replace('x', '#1') + '}'
 
         #add a right endpoint
         if k < length - 1:
             builder.pgfplotsinvokeforeach._raw('{{{}}}'.format(domains[k][2]))._raw(' {')()
-            builder.draw._xy('#1',pgfplots_function)._raw(' node{').color[curr_color]._raw('{$\\')
+            builder.draw._xy('#1',pgfplots_function)._raw(' node{').color[curr_color]._raw('{$')
             if domains[k][4]:
-                builder._raw('bullet')
+                builder._raw('\\bullet')
             else:
-                builder._raw('filledcirc')
+                builder._raw('{\\color{white}\\bullet}\\mathllap{\\circ}')
             builder._raw('$}};}')()
 
         # add a left endpoint
         if k > 0:
             builder.pgfplotsinvokeforeach._raw('{{{}}}'.format(domains[k][1]))._raw(' {')()
-            builder.draw._xy('#1',pgfplots_function)._raw(' node{').color[curr_color]._raw('{$\\')
+            builder.draw._xy('#1',pgfplots_function)._raw(' node{').color[curr_color]._raw('{$')
             if domains[k][3]:
-                builder._raw('bullet')
+                builder._raw('\\bullet')
             else:
-                builder._raw('filledcirc')
+                builder._raw('{\\color{white}\\bullet}\\mathllap{\\circ}')
             builder._raw('$}};}')()
 
     builder.end['axis']()

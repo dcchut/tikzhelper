@@ -1,6 +1,9 @@
 import json
-import colander
 import re
+
+import colander
+
+from tikzhelper.helpers.widget import FancyCheckboxInput
 
 
 class ExtendedNumber(object):
@@ -137,6 +140,12 @@ class PiecewiseSchema(colander.Schema):
                                 default=-5.0)
     max_y = colander.SchemaNode(colander.Float(),
                                 default=5.0)
+    draw_grid = colander.SchemaNode(colander.Bool(),
+                                    widget=FancyCheckboxInput(label='Draw grid'),
+                                    default=True)
+    draw_labels = colander.SchemaNode(colander.Bool(),
+                                      widget=FancyCheckboxInput(label='Draw axis labels'),
+                                      default=True)
 
     def validator(self, form, values):
         # we want all three lists to have the same length

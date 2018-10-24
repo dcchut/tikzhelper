@@ -60,7 +60,9 @@ class PiecewiseView(TabbedView):
                                                         min_x=appstruct['min_x'],
                                                         max_x=appstruct['max_x'],
                                                         min_y=appstruct['min_y'],
-                                                        max_y=appstruct['max_y'])
+                                                        max_y=appstruct['max_y'],
+                                                        draw_grid=appstruct['draw_grid'],
+                                                        draw_labels=appstruct['draw_labels'])
 
                 form.set_appstruct(appstruct)
 

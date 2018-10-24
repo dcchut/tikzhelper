@@ -73,7 +73,19 @@ class RiemannView(TabbedView):
                 appstruct = form.validate(self.request.POST.items())
                 form.set_appstruct(appstruct)
 
-                view['tikz'] = draw_riemann_graph(**appstruct)
+                view['tikz'] = draw_riemann_graph(a=appstruct['a'],
+                                                  b=appstruct['b'],
+                                                  n=appstruct['n'],
+                                                  sample_pos=appstruct['sample_pos'],
+                                                  label=appstruct['label'],
+                                                  function=appstruct['function'],
+                                                  min_x=appstruct['min_x'],
+                                                  max_x=appstruct['max_x'],
+                                                  min_y=appstruct['min_y'],
+                                                  max_y=appstruct['max_y'],
+                                                  draw_grid=appstruct['draw_grid'],
+                                                  draw_labels=appstruct['draw_labels'])
+  
                 view['json'] = json.dumps(appstruct)
 
             except deform.exception.ValidationFailure as e:
