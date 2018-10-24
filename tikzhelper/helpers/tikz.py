@@ -5,29 +5,33 @@ class MagicTikzBuilder:
         self.tikz = ''
         self.tmp = ''
 
-    def nl(self):
+    def _nl(self):
         self.tmp += '\n'
         return self
 
-    def free(self, txt):
+    def _free(self, txt):
         self.tmp += ' {} '.format(txt)
         return self
 
-    def xy(self, x, y):
-        return self.pr('axis cs:{},{}'.format(x,y))
+    def _raw(self, txt):
+        self.tmp += str(txt)
+        return self
 
-    def pr(self,txt):
+    def _xy(self, x, y):
+        return self._pr('axis cs:{},{}'.format(x, y))
+
+    def _pr(self, txt):
         self.tmp += '({})'.format(txt)
         return self
 
-    def sq(self, options, bracket=True):
+    def _sq(self, options, bracket=True):
         unpacked = []
         for k in options:
             if options[k] is None:
                 unpacked.append(k)
             else:
                 if isinstance(options[k],dict):
-                    unpacked.append('{}={{{}}}'.format(k,self.sq(options[k],False)))
+                    unpacked.append('{}={{{}}}'.format(k, self._sq(options[k], False)))
                 else:
                     unpacked.append('{}={}'.format(k,str(options[k])))
 
@@ -48,7 +52,7 @@ class MagicTikzBuilder:
     def __call__(self, line_sep=''):
         # end the line, concat to overall tikz
         self.tmp += line_sep
-        self.nl()
+        self._nl()
 
         # reset buffer
         self.tikz += self.tmp
@@ -102,72 +106,104 @@ class TikzBuilder:
 
         self.tikz += tmp
 
-def draw_riemann_graph(a,b,n, sample_pos, label, function, min_x, max_x,min_y, max_y, fn_variable='x'):
-    builder = TikzBuilder()
 
-    builder.simple_tag('usepackage', 'tikz')
-    builder.simple_tag('usetikzlibrary', 'backgrounds')
-    builder.tikz += '\n'
+def draw_axes(builder, min_x, max_x, min_y, max_y, draw_xticks=True, draw_yticks=True, draw_grid=False):
+    if draw_xticks:
+        xticks = '{' + ','.join([str(x) for x in range(ceil(min_x), floor(max_x)) if x != 0]) + '}'
+    else:
+        xticks = '\\empty'
 
-    builder.simple_tag('begin', 'center')
-    builder.simple_tag('begin','tikzpicture')
+    if draw_yticks:
+        yticks = '{' + ','.join([str(y) for y in range(ceil(min_y), floor(max_y)) if y != 0]) + '}'
+    else:
+        yticks = '\\empty'
 
-    # draw our coordinate axes
-    builder.draw_axes(min_x=min_x,max_x=max_x,min_y=min_y,max_y=max_y, fn_variable=fn_variable)
+    options = {'axis lines': 'middle',
+                              'xlabel': '$x$',
+                              'ylabel': '$y$',
+                              'xticklabels' : {},
+                              'yticklabels' : {},
+                              'xmin': min_x,
+                              'xmax': max_x,
+                              'ymin': min_y,
+                              'ymax': max_y}
+
+    # optionally add a grid to our axes
+    # drawing a grid overrides any x/y tick settings
+    if draw_grid:
+        options['grid'] = 'both'
+        options['minor tick num'] = 1
+    else:
+        options['xtick'] = xticks
+        options['ytick'] = yticks
+
+    builder.begin['axis']._sq(options)()
+
+
+def draw_riemann_graph(a,b,n, sample_pos, label, function, min_x, max_x,min_y, max_y):
+    builder = MagicTikzBuilder()
+    
+    builder.begin['center']()
+    builder.begin['tikzpicture']()
+
+    # draw axes
+    draw_axes(builder=builder,
+              min_x=min_x,
+              max_x=max_x,
+              min_y=min_y,
+              max_y=max_y)
 
     # compute our sample points
-    delta = (b - a) / n
-
+    delta = (b-a)/n
     delta_l = delta * sample_pos
     delta_r = delta - delta_l
 
-    sample_points = [str(a + (delta * (i + delta_l))) for i in range(0,n)]
+    sample_points = '{' + ','.join([str(a + (delta * i) + delta_l) for i in range(0,n)]) + '}'
 
-    builder.tikz += '\\begin{scope}[on background layer]\n'
+    # we have to change from x to #1 to satisfy pgfplots needs
+    pgfplots_function = function.replace('x','#1')
 
     # draw the rectangles
-    builder.tikz += '\\foreach \\x in {' + ','.join(sample_points) + '} {\\pgfmathparse{' + function + '} \\pgfmathresult\n';
-    builder.tikz += f'\\draw[fill=blue!20] (\\x-{delta_l},\\pgfmathresult |- x axis) -- \n'
-    builder.tikz += f'(\\x-{delta_l},\\pgfmathresult) -- (\\x+{delta_r},\\pgfmathresult) -- '
-    builder.tikz += f'(\\x+{delta_r},\\pgfmathresult |- x axis) -- cycle;' + '}\n'
+    builder.pgfplotsinvokeforeach._raw(sample_points)._raw(' {')()
+    builder.draw._sq({'fill' : 'blue!20'})._xy('#1-{}'.format(delta_l),0)._free('--')
+    builder._xy('#1+{}'.format(delta_r),0)._free('--')._xy('#1+{}'.format(delta_r),'{{{}}}'.format(pgfplots_function))._free('--')
+    builder._xy('#1-{}'.format(delta_l),'{{{}}}'.format(pgfplots_function))._raw(' -- cycle')(';')
+    builder._raw('}')()
 
     # label a and b on the graph
-    builder.tikz += f'\\node at ({a},-5pt) ' + '{\\footnotesize{$a$}};\n'
-    builder.tikz += f'\\node at ({b},-5pt) ' + '{\\footnotesize{$b$}};\n'
+    builder.node._sq({'below' : None})._free('at')._xy(a,0)._raw('{\\footnotesize{$a$}}')(';')
+    builder.node._sq({'below' : None})._free('at')._xy(b,0)._raw('{\\footnotesize{$b$}}')(';')
 
-    builder.tikz += f'\\draw[<->,blue,ultra thick,smooth,samples=100,domain={a}:{b}] plot(\\x,' + '{' + function + '});\n'
+    # now plot our function
+    builder.addplot._sq({'<->' : None,
+                         'blue' : None,
+                         'thick' : None,
+                         'smooth' : None,
+                         'samples' : 100,
+                         'domain' : '{}:{}'.format(a,b)})[function](';')
 
-    builder.tikz += '\\end{scope}\n'
-
-    # close open tags
-    builder.simple_tag('end', 'tikzpicture')
-    builder.simple_tag('end', 'center')
+    builder.end['axis']()
+    builder.end['tikzpicture']()
+    builder.end['center']()
 
     return builder.tikz
 
-def draw_piecewise_fn_definition(domains, labels, fn_name='f', fn_variable='x',
+def draw_piecewise_fn_definition(domains, labels,
                                  colors=['blue', 'red', 'orange', 'purple', 'olive', 'violet']):
-    builder = TikzBuilder()
+    builder = MagicTikzBuilder()
 
-    builder.tikz += f"{fn_name}({fn_variable})="
-    builder.simple_tag('begin', 'cases')
+    # begin our function definition
+    builder._raw('f(x)=').begin['cases']()
 
     length = len(domains)
-
     for k in range(0,length):
         curr_color = colors[k % len(colors)]
-        builder.simple_tag('color', curr_color,newline=False)
-        builder.tikz += labels[k]
-        builder.tikz += ' & \\text{if }'
-        builder.simple_tag('color', curr_color,newline=False)
-        builder.tikz += f'{domains[k][0]}'
-        if k == length - 1:
-            builder.tikz += '.'
-        else:
-            builder.tikz += ','
-        builder.tikz += '\\\\\n'
 
-    builder.simple_tag('end','cases')
+        # add the function definition
+        builder.color[curr_color]._raw(labels[k])._free('&').text['if '].color[curr_color]._raw(domains[k][0])
+        builder._raw('.' if k == length - 1 else ',')._raw('\\\\')()
+
+    builder.end['cases']()
 
     return builder.tikz
 
@@ -259,51 +295,56 @@ def draw_piecewise_fn_graph(domains, functions, min_x, max_x, min_y, max_y, fn_n
 
     return builder.tikz
 
-def draw_region_between_curves(xmin=-5.5,xmax=5.5,ymin=-5.5,ymax=5.5,a=-3,b=3,f='2*sin(deg(x)+1)+4',g='cos(deg(x))-1',delta=0.0001):
+def draw_region_between_curves(min_x=-5.5,max_x=5.5,min_y=-3.1,max_y=7.1,a=-5.5,b=3,f='2*sin(deg(x)+1)+4',g='cos(deg(x))-1',delta=0.0001):
     builder = MagicTikzBuilder()
     builder.begin['center']()
     builder.begin['tikzpicture']()
-    builder.begin['axis'].sq({'axis lines': 'middle',
-                              'xlabel': '$x$',
-                              'ylabel': '$y$',
-                              'enlargelimits': None,
-                              'ytick': '\\empty',
-                              'xtick': '\\empty',
-                              'xmin': xmin,
-                              'xmax': xmax,
-                              'ymin': ymin,
-                              'ymax': ymax})()
 
-    builder.addplot.sq({'-': None,
+    draw_axes(builder=builder,
+              min_x=min_x,
+              max_x=max_x,
+              min_y=min_y,
+              max_y=max_y)
+
+    # by default we give our functions arrows at the end of their domain
+    # except if we're taking our integral to the same place
+    plot_decoration = '<->'
+
+    if a == min_x:
+        plot_decoration = '-' if b == max_x else '->'
+    elif b == max_x:
+        plot_decoration = '<-'
+
+    builder.addplot._sq({plot_decoration: None,
                         'blue': None,
                         'thick': None,
                         'smooth': None,
                         'samples': 100,
-                        'domain': '{}:{}'.format(xmin,xmax),
+                        'domain': '{}:{}'.format(min_x,max_x),
                         'name path': 'f'})[f](';')
 
-    builder.addplot.sq({'-': None,
+    builder.addplot._sq({plot_decoration: None,
                         'blue': None,
                         'thick': None,
                         'smooth': None,
                         'samples': 100,
-                        'domain': '{}:{}'.format(xmin,xmax),
+                        'domain': '{}:{}'.format(min_x,max_x),
                         'name path': 'g'})[g](';')
 
-    builder.addplot.sq({'blue': None, 'opacity': 0.1}).free('fill between').sq(
+    builder.addplot._sq({'blue': None, 'opacity': 0.1})._free('fill between')._sq(
         {'of': 'f and g', 'soft clip': {'domain' : '{}:{}'.format(a,b)}})(';')
 
     # compute path intersections
-    builder.path.sq({'name path': 'v_st'}).xy(a+delta, ymin).free('--').xy(a+delta, ymax)(';')
-    builder.path.sq({'name path': 'v_end'}).xy(b-delta,ymin).free('--').xy(b-delta,ymax)(';')
-    builder.path.sq({'name intersections': {'of': 'f and v_st', 'by': 'f_st'}})(';')
-    builder.path.sq({'name intersections': {'of': 'g and v_st', 'by': 'g_st'}})(';')
-    builder.path.sq({'name intersections': {'of': 'f and v_end', 'by': 'f_end'}})(';')
-    builder.path.sq({'name intersections': {'of': 'g and v_end', 'by': 'g_end'}})(';')
+    builder.path._sq({'name path': 'v_st'})._xy(a + delta, min_y)._free('--')._xy(a + delta, max_y)(';')
+    builder.path._sq({'name path': 'v_end'})._xy(b - delta, min_y)._free('--')._xy(b - delta, max_y)(';')
+    builder.path._sq({'name intersections': {'of': 'f and v_st', 'by': 'f_st'}})(';')
+    builder.path._sq({'name intersections': {'of': 'g and v_st', 'by': 'g_st'}})(';')
+    builder.path._sq({'name intersections': {'of': 'f and v_end', 'by': 'f_end'}})(';')
+    builder.path._sq({'name intersections': {'of': 'g and v_end', 'by': 'g_end'}})(';')
 
     # draw the dashed left and right borderse
-    builder.draw.sq({'dashed': None}).pr('f_st').free('--').pr('g_st')(';')
-    builder.draw.sq({'dashed': None}).pr('f_end').free('--').pr('g_end')(';')
+    builder.draw._sq({'dashed': None})._pr('f_st')._free('--')._pr('g_st')(';')
+    builder.draw._sq({'dashed': None})._pr('f_end')._free('--')._pr('g_end')(';')
 
     builder.end['axis']()
     builder.end['tikzpicture']()
