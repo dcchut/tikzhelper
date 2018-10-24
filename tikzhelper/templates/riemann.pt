@@ -5,7 +5,6 @@
             <div class="bd-highlight">
                 <pre><code class="language-latex">${tikz}</code></pre>
             </div>
-            <a href="${request.route_url('riemann_view', _query = {'json' : json})}">Permanent link</a>
         </div>
         <div class="row" tal:condition="e">
             <div class="col">
@@ -25,24 +24,12 @@
                     <div class="col-md-6">
                         <label for="${form['function'].oid}">Formula</label>
                         ${structure:form['function'].serialize()}
-                        <small class="form-text text-muted">Formula must be written in terms of \x, e.g. 2*sin(\x r + 1)+4</small>
+                        <small class="form-text text-muted">Formula must be written in terms of x, e.g. 2*sin(deg(x)+1)+4</small>
                      </div>
             </div>
             <div class="form-row mb-3" tal:condition="form['function'].error">
                 <div class="alert alert-warning">
                     <div class="error-msg-lbl">${form['function'].errormsg}</div>
-                </div>
-            </div>
-            <div class="form-row mb-3">
-                    <div class="col-md-6">
-                        <label for="${form['label'].oid}">Label</label>
-                        ${structure:form['label'].serialize()}
-                        <small class="form-text text-muted">Use standard latex notation, e.g. 2\sin(x+1)+4</small>
-                     </div>
-            </div>
-            <div class="form-row mb-3" tal:condition="form['label'].error">
-                <div class="alert alert-warning">
-                    <div class="error-msg-lbl">${form['label'].errormsg}</div>
                 </div>
             </div>
             <div class="row">

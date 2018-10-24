@@ -14,7 +14,6 @@ def main(global_config, **settings):
     config.add_route('home', '/')
     config.add_route('piecewise', '/piecewise')
     config.add_route('riemann', '/riemann')
-    config.add_route('riemann_view', '/riemann/view')
     config.add_route('integral', '/integrals')
     config.add_route('triangle', '/triangles')
     config.scan()

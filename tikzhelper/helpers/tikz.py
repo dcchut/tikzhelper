@@ -137,7 +137,7 @@ def draw_axes(builder, min_x, max_x, min_y, max_y, draw_grid=False, draw_labels=
     builder.begin['axis']._sq(options)()
 
 
-def draw_riemann_graph(a,b,n, sample_pos, label, function, min_x, max_x,min_y, max_y, draw_grid, draw_labels):
+def draw_riemann_graph(a,b,n, sample_pos, function, min_x, max_x,min_y, max_y, draw_grid, draw_labels):
     builder = MagicTikzBuilder()
 
     builder.begin['center']()
@@ -273,7 +273,7 @@ def draw_piecewise_fn_graph(domains, functions, min_x, max_x, min_y, max_y, draw
 
     return builder.tikz
 
-def draw_region_between_curves(min_x=-5.5,max_x=5.5,min_y=-3.1,max_y=7.1,a=-5.5,b=3,f='2*sin(deg(x)+1)+4',g='cos(deg(x))-1',delta=0.0001):
+def draw_region_between_curves(min_x,max_x,min_y,max_y,a,b,f,g,draw_grid,draw_labels,delta=0.0001):
     builder = MagicTikzBuilder()
     builder.begin['center']()
     builder.begin['tikzpicture']()
@@ -282,7 +282,9 @@ def draw_region_between_curves(min_x=-5.5,max_x=5.5,min_y=-3.1,max_y=7.1,a=-5.5,
               min_x=min_x,
               max_x=max_x,
               min_y=min_y,
-              max_y=max_y)
+              max_y=max_y,
+              draw_grid=draw_grid,
+              draw_labels=draw_labels)
 
     # by default we give our functions arrows at the end of their domain
     # except if we're taking our integral to the same place
@@ -302,7 +304,7 @@ def draw_region_between_curves(min_x=-5.5,max_x=5.5,min_y=-3.1,max_y=7.1,a=-5.5,
                         'name path': 'f'})[f](';')
 
     builder.addplot._sq({plot_decoration: None,
-                        'blue': None,
+                        'red': None,
                         'thick': None,
                         'smooth': None,
                         'samples': 100,
