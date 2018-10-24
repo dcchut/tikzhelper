@@ -85,6 +85,18 @@
                             <small class="form-text text-muted">The maximum x-value to display on our graph.</small>
                 </div>
             </div>
+            <div class="form-row mb-3" tal:condition="form['min_x'].error or form['max_x'].error">
+                <div class="col-md-3">
+                    <div class="alert alert-warning" tal:condition="form['min_x'].error">
+                        <div class="error-msg-lbl">${form['min_x'].errormsg}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="alert alert-warning" tal:condition="form['max_x'].error">
+                        <div class="error-msg-lbl">${form['max_x'].errormsg}</div>
+                    </div>
+                </div>
+            </div>
             <div class="form-row mb-3">
                 <div class="col-md-3">
                             <label for="${form['min_y'].oid}">Min y:</label>
@@ -97,15 +109,15 @@
                             <small class="form-text text-muted">The maximum y-value to display on our graph.</small>
                 </div>
             </div>
-            <div class="form-row mb-3" tal:condition="form['min_x'].error or form['max_x'].error">
+            <div class="form-row mb-3" tal:condition="form['min_y'].error or form['max_y'].error">
                 <div class="col-md-3">
-                    <div class="alert alert-warning" tal:condition="form['min_x'].error">
-                        <div class="error-msg-lbl">${form['min_x'].errormsg}</div>
+                    <div class="alert alert-warning" tal:condition="form['min_y'].error">
+                        <div class="error-msg-lbl">${form['min_y'].errormsg}</div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="alert alert-warning" tal:condition="form['max_x'].error">
-                        <span class="error-msg-lbl">${form['max_x'].errormsg}</span>
+                    <div class="alert alert-warning" tal:condition="form['max_y'].error">
+                        <span class="error-msg-lbl">${form['max_y'].errormsg}</span>
                     </div>
                 </div>
             </div>

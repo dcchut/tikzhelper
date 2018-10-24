@@ -113,7 +113,6 @@
                             <small class="form-text text-muted">The maximum x-value to display on our graph.</small>
                 </div>
             </div>
-
             <div class="form-row mb-3" tal:condition="form['min_x'].error or form['max_x'].error">
                 <div class="col-md-3">
                     <div class="alert alert-warning" tal:condition="form['min_x'].error">
@@ -126,7 +125,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="form-row mb-3">
                 <div class="col-md-3">
                             <label for="${form['min_y'].oid}">Min y:</label>
@@ -139,7 +137,6 @@
                             <small class="form-text text-muted">The maximum y-value to display on our graph.</small>
                 </div>
             </div>
-
             <div class="form-row mb-3" tal:condition="form['min_y'].error or form['max_y'].error">
                 <div class="col-md-3">
                     <div class="alert alert-warning" tal:condition="form['min_y'].error">

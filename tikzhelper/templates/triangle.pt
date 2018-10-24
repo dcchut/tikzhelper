@@ -38,14 +38,12 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="form-row">
                     <div class="col-md-8">
                         <small class="form-text text-muted">Specify side lengths in centimetres. A side length close to 5 is recommended.</small>
                     </div>
                 </div>
             </div>
-
             <div class="form-group">
                 <div class="form-row">
                     <div class="col-md-4">
@@ -66,7 +64,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="form-group">
                 <div class="form-row">
                     <div class="col-md-4">
@@ -88,7 +85,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="form-group">
                 <div class="form-row">
                     <div class="col-md-4">
@@ -110,7 +106,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="form-group">
                 <div class="form-row">
                     <div class="col">

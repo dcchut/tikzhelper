@@ -3,28 +3,31 @@ from math import cos, sin, ceil, floor
 class MagicTikzBuilder:
     def __init__(self):
         self.tikz = ''
-        self.tmp = ''
+        self._tmp = ''
+        self._indent = 0
+        self._indentpredelta = 0
+        self._indentpostdelta = 0
 
     def _nl(self):
-        self.tmp += '\n'
+        self._tmp += '\n'
         return self
 
     def _free(self, txt):
-        self.tmp += ' {} '.format(txt)
+        self._tmp += ' {} '.format(txt)
         return self
 
     def _raw(self, txt):
-        self.tmp += str(txt)
+        self._tmp += str(txt)
         return self
 
     def _xy(self, x, y):
         return self._pr('axis cs:{},{}'.format(x, y))
 
     def _pr(self, txt):
-        self.tmp += '({})'.format(txt)
+        self._tmp += '({})'.format(txt)
         return self
 
-    def _sq(self, options, bracket=True):
+    def _sq(self, options, bracket=True, newline=False):
         unpacked = []
         for k in options:
             if options[k] is None:
@@ -36,27 +39,56 @@ class MagicTikzBuilder:
                     unpacked.append('{}={}'.format(k,str(options[k])))
 
         if not bracket:
-            return ','.join(unpacked)
+                return ','.join(unpacked)
+
         else:
-            self.tmp += '[' + ','.join(unpacked) + ']'
+            if newline and len(unpacked) > 0:
+                tmp = ''
+                for k, line in enumerate(unpacked):
+                    if k == 0:
+                        tmp += '{},\n'.format(line)
+                    else:
+                        tmp += ('    ' * self._indent) + (' ' * (len(self._tmp) + 1)) + '{},\n'.format(line)
+                tmp = tmp[:-2]
+                self._tmp += '[{}]'.format(tmp)
+            else:
+                self._tmp += '[{}]'.format(','.join(unpacked))
+
             return self
 
     def __getitem__(self, item):
-        self.tmp += '{' + '{}'.format(item) + '}'
+        self._tmp += '{' + '{}'.format(item) + '}'
         return self
 
     def __getattr__(self, name):
-        self.tmp += '\\{}'.format(name)
+        # increase indent level by 1 after we begin a tag
+        if name == 'begin':
+            self._indentpostdelta += 1
+        # decrease indent level by 1 whenever we end a tag
+        if name == 'end':
+            self._indentpredelta -= 1
+
+        self._tmp += '\\{}'.format(name)
         return self
 
     def __call__(self, line_sep=''):
         # end the line, concat to overall tikz
-        self.tmp += line_sep
+        self._tmp += line_sep
         self._nl()
 
-        # reset buffer
-        self.tikz += self.tmp
-        self.tmp = ''
+        # update the indent with the pre delta
+        self._indent = max(0, self._indent + self._indentpredelta)
+
+        # indent the line
+        self.tikz += '    ' * self._indent + self._tmp
+
+        # update the indent with the post delta for the next line
+        self._indent = max(0, self._indent + self._indentpostdelta)
+
+        # reset buffers
+        self._indentpredelta = 0
+        self._indentpostdelta = 0
+        self._tmp = ''
 
 
 class TikzBuilder:
@@ -134,7 +166,7 @@ def draw_axes(builder, min_x, max_x, min_y, max_y, draw_grid=False, draw_labels=
         options['xticklabels'] = {}
         options['yticklabels'] = {}
 
-    builder.begin['axis']._sq(options)()
+    builder.begin['axis']._sq(options, newline=True)()
 
 
 def draw_riemann_graph(a,b,n, sample_pos, function, min_x, max_x,min_y, max_y, draw_grid, draw_labels):
@@ -295,22 +327,35 @@ def draw_region_between_curves(min_x,max_x,min_y,max_y,a,b,f,g,draw_grid,draw_la
     elif b == max_x:
         plot_decoration = '<-'
 
-    builder.addplot._sq({plot_decoration: None,
+    f_options = {plot_decoration: None,
                         'blue': None,
                         'thick': None,
                         'smooth': None,
                         'samples': 100,
                         'domain': '{}:{}'.format(min_x,max_x),
-                        'name path': 'f'})[f](';')
+                        'name path': 'f'}
 
-    builder.addplot._sq({plot_decoration: None,
+    # we don't draw the function if it's zero
+    if f == '0':
+        f_options['draw'] = 'none'
+
+    builder.addplot._sq(f_options)[f](';')
+
+    g_options = {plot_decoration: None,
                         'red': None,
                         'thick': None,
                         'smooth': None,
                         'samples': 100,
                         'domain': '{}:{}'.format(min_x,max_x),
-                        'name path': 'g'})[g](';')
+                        'name path': 'g'}
 
+    # we don't draw the function if it's zero
+    if g == '0':
+        g_options['draw'] = 'none'
+
+    builder.addplot._sq(g_options)[g](';')
+
+    # draw the region between f and g
     builder.addplot._sq({'blue': None, 'opacity': 0.1})._free('fill between')._sq(
         {'of': 'f and g', 'soft clip': {'domain' : '{}:{}'.format(a,b)}})(';')
 

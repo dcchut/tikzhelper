@@ -27,24 +27,31 @@
 
   <body>
     <!-- Header code -->
-    <div class="container header">
-            <div class="heading">
-                <p class="h2">TikzHelper</p>
-                <small class="text-muted">By Robert Usher</small>
-            </div>
-            <ul class="nav nav-tabs">
-                <div tal:repeat="tab nav.tabs">
-                    <li class="nav-item">
-                        <a tal:attributes="class 'nav-link' + (' active' if nav.current == tab.name else '')"
-                           href="${request.route_url(tab.route_name)}">${tab.label}</a>
-                    </li>
+    <div class="header">
+        <div class="container pt-3">
+                <div class="mb-3">
+                    <p class="h2">TikzHelper</p>
                 </div>
-            </ul>
+        </div>
+        <ul class="nav nav-tabs w-100">
+            <div class="container pl-0 nav nav-tabs">
+                <li tal:repeat="tab nav.tabs" class="nav-item">
+                    <a tal:attributes="class 'nav-link' + (' active' if nav.current == tab.name else '')"
+                       href="${request.route_url(tab.route_name)}">${tab.label}</a>
+                </li>
+            </div>
+        </ul>
     </div>
 
     <!-- Page content -->
     <div class="container">
      <div metal:define-slot="content"></div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+        <small class="text-muted">By Robert Usher.  Source available on <a href="https://github.com/dcchut/tikzhelper">GitHub</a>.</small>
+        </div>
     </div>
 
     <!-- Bootstrap core JavaScript
