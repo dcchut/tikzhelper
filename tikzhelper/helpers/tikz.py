@@ -142,7 +142,7 @@ def draw_axes(builder, min_x, max_x, min_y, max_y, draw_xticks=True, draw_yticks
 
 def draw_riemann_graph(a,b,n, sample_pos, label, function, min_x, max_x,min_y, max_y):
     builder = MagicTikzBuilder()
-    
+
     builder.begin['center']()
     builder.begin['tikzpicture']()
 
@@ -209,89 +209,70 @@ def draw_piecewise_fn_definition(domains, labels,
 
 def draw_piecewise_fn_graph(domains, functions, min_x, max_x, min_y, max_y, fn_name='f', fn_variable='x',
                             colors=['blue', 'red', 'orange', 'purple', 'olive', 'violet']):
-    builder = TikzBuilder()
+    builder = MagicTikzBuilder()
+    #builder.usepackage['tikz']()
+    #builder.usepackage['mathtools']()
+    #builder()
 
-    # required libraries
-    builder.simple_tag('usepackage', 'tikz')
-    builder.simple_tag('usepackage', 'mathtools')
-    builder.tikz += '\n'
+    builder.begin['center']()
+    builder.newcommand.filledcirc._raw('{{\\color{white}\\bullet}\\mathllap{\\circ}}')()
+    builder.begin['tikzpicture']()
 
-    builder.simple_tag('begin', 'center')
-    # makes a \filledcirc tex command to create a filled circle
-    builder.tikz += '\\newcommand\\filledcirc{{\\color{white}\\bullet}\\mathllap{\\circ}}\n'
-
-    builder.simple_tag('begin', 'tikzpicture', {'scale' : 1})
-
-    # craw the coordinate axes
-    builder.draw_axes(min_x=min_x,max_x=max_x,min_y=min_y,max_y=max_y, fn_variable=fn_variable)
-
-    # draw a handy-dandy grid
-    builder.tikz += f'\\draw[help lines] ({min_x},{min_y}) grid ({max_x},{max_y});\n'
-
-    # we want our axis labels to be integers, so we truncate min/max x/y
-    # in the appropriate direction
-    min_x = ceil(min_x)
-    max_x = floor(max_x)
-
-    min_y = ceil(min_y)
-    max_y = floor(max_y)
-
-    # draw x-axis labels
-    builder.tikz += '\\foreach \\x in {' + ','.join([str(x) for x in range(min_x,max_x+1) if x != 0]) + '} {\\draw (\\x, 0)'
-    builder.tikz += ' node[below]{\\small{$\\x$}};}\n'
-
-    # draw y-axis labels
-    builder.tikz += '\\foreach \\y in {' + ','.join([str(y) for y in range(min_y,max_y+1) if y != 0]) + '} {\\draw (0,\\y)'
-    builder.tikz += ' node[left]{\\small{$\\y$}};}\n'
+    draw_axes(builder=builder,
+              min_x=min_x,
+              max_x=max_x,
+              min_y=min_y,
+              max_y=max_y,
+              draw_grid=True)
 
     # now draw each section of the graph
     length = len(domains)
 
-    for k in range(0,length):
+    for k in range(0, length):
+        # draw arrows as appropriate
+        plot_decoration = '-'
+        if k == 0 and length == 1:
+            plot_decoration = '<->'
+        elif k == 0:
+            plot_decoration = '<-'
+        elif k == length - 1:
+            plot_decoration = '->'
+
         # cycle through our defined colors
         curr_color = colors[k % len(colors)]
-        builder.simple_tag('color', curr_color)
 
-        builder.tikz += '\\draw['
+        builder.addplot._sq({plot_decoration: None,
+                             curr_color: None,
+                             'thick': None,
+                             'smooth': None,
+                             'samples': 100,
+                             'domain': '{}:{}'.format(domains[k][1],domains[k][2])})[functions[k]](';')
+        # we have to change from x to #1 to satisfy pgfplots needs
+        pgfplots_function = functions[k].replace('x', '#1')
 
-        # draw arrows as appropriate
-        if k == 0 and length == 1:
-            builder.tikz += '<->'
-        elif k == 0:
-            builder.tikz += '<-'
-        elif k == length - 1:
-            builder.tikz += '->'
-        else:
-            builder.tikz += '-'
-
-        builder.tikz += ',ultra thick,smooth,samples=100,domain='
-        builder.tikz += str(domains[k][1]) + ':' + str(domains[k][2]) + '] plot'
-        builder.tikz += '(\\x,{' + str(functions[k]) + '});\n'
-
-        # add a right endpoint
+        #add a right endpoint
         if k < length - 1:
-            # dirty hack
-            builder.tikz += '\\foreach \\x in {' + str(domains[k][2]) + '}'
-            builder.tikz += ' {\\draw (\\x,{' + str(functions[k]) + '}) node{{$\\'
+            builder.pgfplotsinvokeforeach._raw('{{{}}}'.format(domains[k][2]))._raw(' {')()
+            builder.draw._xy('#1',pgfplots_function)._raw(' node{').color[curr_color]._raw('{$\\')
             if domains[k][4]:
-                builder.tikz += 'bullet'
+                builder._raw('bullet')
             else:
-                builder.tikz += 'filledcirc'
-            builder.tikz += '$}};};\n'
+                builder._raw('filledcirc')
+            builder._raw('$}};}')()
 
         # add a left endpoint
         if k > 0:
-            # dirty hack
-            builder.tikz += '\\foreach \\x in {' + str(domains[k][1]) + '}'
-            builder.tikz += ' {\\draw (\\x,{' + str(functions[k]) + '}) node{{$\\'
+            builder.pgfplotsinvokeforeach._raw('{{{}}}'.format(domains[k][1]))._raw(' {')()
+            builder.draw._xy('#1',pgfplots_function)._raw(' node{').color[curr_color]._raw('{$\\')
             if domains[k][3]:
-                builder.tikz += 'bullet'
+                builder._raw('bullet')
             else:
-                builder.tikz += 'filledcirc'
-            builder.tikz += '$}};};\n'
+                builder._raw('filledcirc')
+            builder._raw('$}};}')()
 
-    builder.simple_tag('end', 'tikzpicture')
-    builder.simple_tag('end', 'center')
+    builder.end['axis']()
+    builder.end['tikzpicture']()
+    builder.end['center']()
 
     return builder.tikz
 
