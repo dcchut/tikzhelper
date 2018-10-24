@@ -1,5 +1,129 @@
 <div metal:use-macro="load: layout.pt">
     <div metal:fill-slot="content" class="content">
-        <p>TBC</p>
+        <div tal:condition="tikz" class="mb-4">
+            <p class="font-weight-bold">Generated code:</p>
+            <div class="bd-highlight">
+                <pre><code class="language-latex">${tikz}</code></pre>
+            </div>
+        </div>
+        <div class="row" tal:condition="e">
+            <div class="col">
+                <div class="alert alert-danger" tal:condition="form.error">
+                    <div class="error-msg-lbl" i18n:translate="">There was a problem with your submission</div>
+                </div>
+            </div>
+        </div>
+        <form method="POST"
+              action="${request.route_url('integral')}">
+            <div class="row">
+                <div class="form-row col-md-6">
+                    <p class="font-weight-bold">Function settings:</p>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                    <div class="col-md-6">
+                        <label for="${form['function1'].oid}">Formula 1</label>
+                        ${structure:form['function1'].serialize()}
+                        <small class="form-text text-muted">Formula must be written in terms of x, e.g. 2*sin(deg(x)+1)+4</small>
+                     </div>
+            </div>
+            <div class="form-row mb-3" tal:condition="form['function1'].error">
+                <div class="alert alert-warning">
+                    <div class="error-msg-lbl">${form['function1'].errormsg}</div>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                    <div class="col-md-6">
+                        <label for="${form['function2'].oid}">Formula 2</label>
+                        ${structure:form['function2'].serialize()}
+                        <small class="form-text text-muted">Formula must be written in terms of x, e.g. 2*sin(deg(x)+1)+4</small>
+                     </div>
+            </div>
+            <div class="form-row mb-3" tal:condition="form['function2'].error">
+                <div class="alert alert-warning">
+                    <div class="error-msg-lbl">${form['function2'].errormsg}</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-row col-md-6">
+                    <p class="font-weight-bold">Graphing settings:</p>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-3">
+                            <label for="${form['a'].oid}">a:</label>
+                            ${structure:form['a'].serialize()}
+                            <small class="form-text text-muted">The left endpoint of your interval.</small>
+                </div>
+                <div class="col-md-3">
+                            <label for="${form['b'].oid}">b:</label>
+                            ${structure:form['b'].serialize()}
+                            <small class="form-text text-muted">The right endpoint of your interval.</small>
+                </div>
+            </div>
+            <div class="form-row mb-3" tal:condition="form['a'].error or form['b'].error">
+                <div class="col-md-3">
+                    <div class="alert alert-warning" tal:condition="form['a'].error">
+                        <div class="error-msg-lbl">${form['a'].errormsg}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="alert alert-warning" tal:condition="form['b'].error">
+                        <div class="error-msg-lbl">${form['b'].errormsg}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-3">
+                            <label for="${form['min_x'].oid}">Min x:</label>
+                            ${structure:form['min_x'].serialize()}
+                            <small class="form-text text-muted">The minimum x-value to display on our graph.</small>
+                </div>
+                <div class="col-md-3">
+                            <label for="${form['max_x'].oid}">Max x:</label>
+                            ${structure:form['max_x'].serialize()}
+                            <small class="form-text text-muted">The maximum x-value to display on our graph.</small>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-3">
+                            <label for="${form['min_y'].oid}">Min y:</label>
+                            ${structure:form['min_y'].serialize()}
+                            <small class="form-text text-muted">The minimum y-value to display on our graph.</small>
+                </div>
+                <div class="col-md-3">
+                            <label for="${form['max_y'].oid}">Max y:</label>
+                            ${structure:form['max_y'].serialize()}
+                            <small class="form-text text-muted">The maximum y-value to display on our graph.</small>
+                </div>
+            </div>
+            <div class="form-row mb-3" tal:condition="form['min_x'].error or form['max_x'].error">
+                <div class="col-md-3">
+                    <div class="alert alert-warning" tal:condition="form['min_x'].error">
+                        <div class="error-msg-lbl">${form['min_x'].errormsg}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="alert alert-warning" tal:condition="form['max_x'].error">
+                        <span class="error-msg-lbl">${form['max_x'].errormsg}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-3">
+                            ${structure:form['draw_grid'].serialize()}
+                            <small class="form-text text-muted">Whether to draw axis gridlines.</small>
+                </div>
+                <div class="col-md-3">
+                            ${structure:form['draw_labels'].serialize()}
+                            <small class="form-text text-muted">Whether to draw axis labels.</small>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-3">
+                    <input type="submit" name="submit" value="Generate" class="btn btn-primary">
+                </div>
+            </div>
+        </form>
     </div>
 </div>

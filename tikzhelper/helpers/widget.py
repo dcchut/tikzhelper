@@ -1,5 +1,5 @@
-from deform.widget import TextInputWidget, CheckboxWidget
 from deform.renderer import configure_zpt_renderer
+from deform.widget import TextInputWidget, CheckboxWidget
 
 # let deform know about our custom templates
 configure_zpt_renderer(["tikzhelper:templates/deform"])

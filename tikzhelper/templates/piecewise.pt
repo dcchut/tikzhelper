@@ -44,7 +44,7 @@
                     <div class="col-md-6">
                         <label for="fn">Formula</label>
                         <input id="fn" name="fn" type="text" class="form-control" placeholder="Enter formula here">
-                        <small class="form-text text-muted">Formula must be written in terms of \x, e.g. (\x)+sqrt(25-(\x)^2)</small>
+                        <small class="form-text text-muted">Formula must be written in terms of x, e.g. x+sqrt(25-x^2)</small>
                      </div>
                     <div class="col-md-6">
                         <label for="fn_label">Label</label>
@@ -152,7 +152,16 @@
                     </div>
                 </div>
             </div>
-
+            <div class="form-row mb-3">
+                <div class="col-md-3">
+                            ${structure:form['draw_grid'].serialize()}
+                            <small class="form-text text-muted">Whether to draw axis gridlines.</small>
+                </div>
+                <div class="col-md-3">
+                            ${structure:form['draw_labels'].serialize()}
+                            <small class="form-text text-muted">Whether to draw axis labels.</small>
+                </div>
+            </div>
             <div class="form-row mb-3">
                 <div class="col-md-3">
                     <input type="submit" name="submit" value="Generate" class="btn btn-primary">

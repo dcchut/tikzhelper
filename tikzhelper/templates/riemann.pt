@@ -5,7 +5,6 @@
             <div class="bd-highlight">
                 <pre><code class="language-latex">${tikz}</code></pre>
             </div>
-            <a href="${request.route_url('riemann_view', _query = {'json' : json})}">Permanent link</a>
         </div>
         <div class="row" tal:condition="e">
             <div class="col">
@@ -25,7 +24,7 @@
                     <div class="col-md-6">
                         <label for="${form['function'].oid}">Formula</label>
                         ${structure:form['function'].serialize()}
-                        <small class="form-text text-muted">Formula must be written in terms of \x, e.g. 2*sin(\x r + 1)+4</small>
+                        <small class="form-text text-muted">Formula must be written in terms of x, e.g. 2*sin(deg(x)+1)+4</small>
                      </div>
             </div>
             <div class="form-row mb-3" tal:condition="form['function'].error">
@@ -33,45 +32,9 @@
                     <div class="error-msg-lbl">${form['function'].errormsg}</div>
                 </div>
             </div>
-            <div class="form-row mb-3">
-                    <div class="col-md-6">
-                        <label for="${form['label'].oid}">Label</label>
-                        ${structure:form['label'].serialize()}
-                        <small class="form-text text-muted">Use standard latex notation, e.g. 2\sin(x+1)+4</small>
-                     </div>
-            </div>
-            <div class="form-row mb-3" tal:condition="form['label'].error">
-                <div class="alert alert-warning">
-                    <div class="error-msg-lbl">${form['label'].errormsg}</div>
-                </div>
-            </div>
             <div class="row">
                 <div class="form-row col-md-6">
                     <p class="font-weight-bold">Graphing settings:</p>
-                </div>
-            </div>
-            <div class="form-row mb-3">
-                <div class="col-md-3">
-                            <label for="${form['n'].oid}">Number of rectangles:</label>
-                            ${structure:form['n'].serialize()}
-                            <small class="form-text text-muted">Number of rectangles to use in your Riemann sum.</small>
-                </div>
-                <div class="col-md-3">
-                            <label for="${form['sample_pos'].oid}">Sample point position:</label>
-                            ${structure:form['sample_pos'].serialize()}
-                            <small class="form-text text-muted">Specify a number between 0 and 1 to determine where we take our sample points.</small>
-                </div>
-            </div>
-            <div class="form-row mb-3" tal:condition="form['n'].error or form['sample_pos'].error">
-                <div class="col-md-3">
-                    <div class="alert alert-warning" tal:condition="form['n'].error">
-                        <div class="error-msg-lbl">${form['n'].errormsg}</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="alert alert-warning" tal:condition="form['sample_pos'].error">
-                        <div class="error-msg-lbl">${form['sample_pos'].errormsg}</div>
-                    </div>
                 </div>
             </div>
             <div class="form-row mb-3">
@@ -98,7 +61,30 @@
                     </div>
                 </div>
             </div>
-
+            <div class="form-row mb-3">
+                <div class="col-md-3">
+                            <label for="${form['n'].oid}">Number of rectangles:</label>
+                            ${structure:form['n'].serialize()}
+                            <small class="form-text text-muted">Number of rectangles to use in your Riemann sum.</small>
+                </div>
+                <div class="col-md-3">
+                            <label for="${form['sample_pos'].oid}">Sample point position:</label>
+                            ${structure:form['sample_pos'].serialize()}
+                            <small class="form-text text-muted">Specify a number between 0 and 1 to determine where we take our sample points.</small>
+                </div>
+            </div>
+            <div class="form-row mb-3" tal:condition="form['n'].error or form['sample_pos'].error">
+                <div class="col-md-3">
+                    <div class="alert alert-warning" tal:condition="form['n'].error">
+                        <div class="error-msg-lbl">${form['n'].errormsg}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="alert alert-warning" tal:condition="form['sample_pos'].error">
+                        <div class="error-msg-lbl">${form['sample_pos'].errormsg}</div>
+                    </div>
+                </div>
+            </div>
             <div class="form-row mb-3">
                 <div class="col-md-3">
                             <label for="${form['min_x'].oid}">Min x:</label>
@@ -133,6 +119,16 @@
                     <div class="alert alert-warning" tal:condition="form['max_x'].error">
                         <span class="error-msg-lbl">${form['max_x'].errormsg}</span>
                     </div>
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col-md-3">
+                            ${structure:form['draw_grid'].serialize()}
+                            <small class="form-text text-muted">Whether to draw axis gridlines.</small>
+                </div>
+                <div class="col-md-3">
+                            ${structure:form['draw_labels'].serialize()}
+                            <small class="form-text text-muted">Whether to draw axis labels.</small>
                 </div>
             </div>
             <div class="form-row">

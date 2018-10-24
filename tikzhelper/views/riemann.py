@@ -1,7 +1,4 @@
-import json
-
 import deform
-from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
 from pyramid.view import view_config
 
 from tikzhelper.helpers.tikz import draw_riemann_graph
@@ -27,38 +24,6 @@ class RiemannView(TabbedView):
 
         return view
 
-    @view_config(route_name='riemann_view', renderer='../templates/riemann_view.pt')
-    def riemann_view(self):
-        view = self.get_view()
-        form = deform.Form(self.schema, buttons=('submit',))
-
-        if 'json' in self.request.GET:
-            try:
-                struct = json.loads(self.request.GET['json'])
-            except ValueError as e:
-                raise HTTPBadRequest()
-
-            # we have to convert our json to a nicer format
-            tmp = []
-
-            # the value here needs to be a string or nothing works
-            for k in struct:
-                tmp.append((k, str(struct[k])),)
-
-            try:
-                appstruct = form.validate(tmp)
-                view['tikz'] = draw_riemann_graph(**appstruct)
-
-            except ValueError as e:
-                raise HTTPBadRequest()
-            except deform.exception.ValidationFailure as e:
-                raise HTTPBadRequest()
-        else:
-            return HTTPFound(self.request.route_url('riemann'))
-
-        return view
-
-
     @view_config(route_name='riemann', renderer='../templates/riemann.pt')
     def riemann(self):
         view = self.get_view()
@@ -73,8 +38,17 @@ class RiemannView(TabbedView):
                 appstruct = form.validate(self.request.POST.items())
                 form.set_appstruct(appstruct)
 
-                view['tikz'] = draw_riemann_graph(**appstruct)
-                view['json'] = json.dumps(appstruct)
+                view['tikz'] = draw_riemann_graph(a=appstruct['a'],
+                                                  b=appstruct['b'],
+                                                  n=appstruct['n'],
+                                                  sample_pos=appstruct['sample_pos'],
+                                                  function=appstruct['function'],
+                                                  min_x=appstruct['min_x'],
+                                                  max_x=appstruct['max_x'],
+                                                  min_y=appstruct['min_y'],
+                                                  max_y=appstruct['max_y'],
+                                                  draw_grid=appstruct['draw_grid'],
+                                                  draw_labels=appstruct['draw_labels'])
 
             except deform.exception.ValidationFailure as e:
                 view['e'] = e
