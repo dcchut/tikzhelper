@@ -27,10 +27,13 @@
 
   <body>
       <!-- Header -->
-      <div class="bs-component bg-primary">
-          <nav class="container navbar navbar-expand-lg navbar-dark">
+      <div class="bs-component bg-dark">
+          <nav class="container navbar navbar-expand-lg navbar-dark bg-dark">
             <a class="navbar-brand" href="#">TikzHelper</a>
-            <div class="collapse navbar-collapse">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar">
               <ul class="navbar-nav mr-auto">
                 <li tal:repeat="tab nav.tabs" tal:attributes="class 'nav-item' + (' active' if nav.current == tab.name else '')">
                     <a class="nav-link" href="${request.route_url(tab.route_name)}">${tab.label}</a>
