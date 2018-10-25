@@ -27,7 +27,7 @@
 
   <body>
       <!-- Header -->
-      <div class="bs-component bg-dark">
+      <div class="bg-dark">
           <nav class="container navbar navbar-expand-lg navbar-dark bg-dark">
             <a class="navbar-brand" href="#">TikzHelper</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
