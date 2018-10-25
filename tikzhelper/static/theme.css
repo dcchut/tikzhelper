@@ -1,13 +1,10 @@
 html {
   position: relative;
+  overflow-y: scroll;
 }
 
 body {
   margin-bottom: 50px;
-}
-
-.header {
-  background-color: #fafafa;
 }
 
 .tikzcode {
@@ -23,7 +20,6 @@ body {
   position: absolute;
   bottom: 0;
   width: 100%;
-  background-color: #f5f5f5;
   height: 50px;
   line-height: 50px;
 }

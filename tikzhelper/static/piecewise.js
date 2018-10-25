@@ -24,9 +24,7 @@ $(document).ready(function(){
         div3.html(get_code_span(label));
 
         var div4 = $('<div class="col-md-1 p-0"></div>');
-
         var button = $('<button type="button" class="close fn-listentry-delete">&times;</button>');
-
         div4.html(button);
 
         li.append(div1);
