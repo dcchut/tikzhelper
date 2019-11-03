@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  backend:
+    image: tikzhelper/backend
+    build:
+      context: ./tikzhelper/
+    volumes:
+        - ./backend/public:/usr/src/app/public
+  frontend:
+    image: tikzhelper/frontend
+    build:
+      context: .
+      dockerfile: Dockerfile-frontend
+    volumes:
+      - ./backend/public:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+    ports:
+      - 80:80

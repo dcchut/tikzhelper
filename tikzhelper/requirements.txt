@@ -1,0 +1,17 @@
+Chameleon==3.6.2
+colander==1.7.0
+deform==2.0.8
+hupper==1.9
+iso8601==0.1.12
+Mako==1.1.0
+MarkupSafe==1.1.1
+peppercorn==0.6
+plaster==1.0
+plaster-pastedeploy==0.7
+Pygments==2.4.2
+pyramid==1.10.4
+pyramid-chameleon==0.3
+pyramid-mako==1.1.0
+repoze.lru==0.7
+paste==3.2.2
+PasteDeploy==2.0.1
