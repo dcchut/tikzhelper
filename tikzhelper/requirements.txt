@@ -3,7 +3,7 @@ colander==1.7.0
 deform==2.0.8
 hupper==1.9
 iso8601==0.1.12
-Mako==1.1.0
+Mako==1.2.2
 MarkupSafe==1.1.1
 peppercorn==0.6
 plaster==1.0
